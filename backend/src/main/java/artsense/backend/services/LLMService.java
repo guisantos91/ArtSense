@@ -180,18 +180,6 @@ public class LLMService {
 
         System.out.println("Start upload request: " + startUploadRequest);
     
-        // String uploadUrl;
-        // try (Response response = this.client.newCall(startUploadRequest).execute()) {
-        //     if (!response.isSuccessful()) {
-        //         throw new IOException("Failed to start upload: " + response);
-        //     }
-        //     uploadUrl = response.header("X-Goog-Upload-URL");
-        //     if (uploadUrl == null) {
-        //         System.out.println("Response: " + response);
-        //         System.out.println("Response headers: " + response.headers());
-        //         throw new IOException("Upload URL not found in response headers.");
-        //     }
-        // }
         String uploadUrl = startUploadUrl;
 
         System.out.println("Upload URL: " + uploadUrl);
