@@ -20,10 +20,11 @@ const StartScreen = () => {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="w-[95%] h-[95%] bg-primary items-center self-center">
-          <Text className="mt-[6%] text-center text-quaternary font-ebgaramond text-2xl leading-10">
-            InMuseum
-          </Text>
-
+          <Image
+            source={require("../../assets/images/imgs/logo.png")}
+            className="mt-[10%] w-full h-[5%] rounded-full"
+            resizeMode="contain"
+          />
           <View className="mt-[7%] w-[98%] min-h-[540px] bg-octonary rounded-[72px] relative overflow-hidden">
             <Image
               source={require("../../assets/images/imgs/main-image.png")}
@@ -37,13 +38,14 @@ const StartScreen = () => {
               </Text>
 
               <Text className="mt-5 w-full text-quaternary font-medium text-sm leading-[18px]">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s.
+                From symbols of power to everyday life, explore how artists have shaped history. Uncover hidden stories and techniques with{" "}
+                <Text className="text-quaternary font-extrabold">ArtSense</Text>.
               </Text>
 
-              <TouchableOpacity className="mt-5 w-[116px] h-[36px] border border-[#f0eace2e] rounded-[14px] items-center justify-center">
-                <Text className="text-white font-medium text-sm leading-[18px]">
+              <TouchableOpacity 
+                onPress={() => router.push("./screens/ExploreScreen")}
+                className="mt-5 w-[116px] h-[36px] border border-[#f0eace2e] rounded-[14px] items-center justify-center">
+                <Text className="text-undecenary font-medium text-sm leading-[18px]">
                   Explore more...
                 </Text>
               </TouchableOpacity>
