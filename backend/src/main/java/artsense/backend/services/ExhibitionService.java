@@ -16,6 +16,7 @@ import artsense.backend.dto.ExhibitionCardView;
 import artsense.backend.dto.ExhibitionCardWithMuseum;
 import artsense.backend.dto.ExhibitionIngressView;
 import artsense.backend.dto.ExhibitionView;
+import artsense.backend.dto.LLMUpload;
 import artsense.backend.models.Artifact;
 import artsense.backend.models.Exhibition;
 import artsense.backend.repositories.ExhibitionRepository;
@@ -80,7 +81,7 @@ public class ExhibitionService {
         exhibition.getArtifacts().forEach(artifact -> {
             artifactInfoTemp.put(artifact.getArtefactId(), new ArtifactInfoTemp(
                 artifact.getName(),
-                artifact.getPhotoUrl()
+                new LLMUpload(artifact.getLlmPhotoUrl(), artifact.getLlmMimeType())
             ));
         });
 
@@ -88,7 +89,7 @@ public class ExhibitionService {
             return null;
         }
 
-        String responseBody = llmService.locateArtifacts(image);
+        String responseBody = llmService.locateArtifacts(image, artifactInfoTemp);
         
         if (responseBody.isEmpty()) {
             return null;
