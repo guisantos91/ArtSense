@@ -3,6 +3,13 @@ package artsense.backend.services;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
@@ -72,38 +79,10 @@ public class LLMService {
     public String locateArtifacts(MultipartFile multipartFile, Map<Long, ArtifactInfoTemp> artifactInfoTemp) throws IOException {
         System.out.println("LLMService: locateArtifacts called");
 
-        // String geminiPrompt =
-        //     "You are an image‐analysis assistant. Given:\n" +
-        //     "  • An uploaded photo (binary or base64 image)\n" +
-        //     "  • A list of candidate artifacts, each with:\n" +
-        //     "      – id: unique identifier\n" +
-        //     "      – photoURI: URL or reference to its canonical image\n" +
-        //     "      – mimeType: e.g. \"image/jpeg\"\n\n" +
-        //     "Task:\n" +
-        //     "  1. Detect which of these artifacts appear in the uploaded photo.\n" +
-        //     "  2. For each detected artifact, compute the pixel coordinates of its center\n" +
-        //     "     in the uploaded image as [x, y].\n" +
-        //     "  3. Return exactly one JSON object with a single field \"detections\", whose\n" +
-        //     "     value is a list of [x, y, id] triples.\n" +
-        //     "  4. If no listed artifact is found, return \"detections\": [].\n\n" +
-        //     "Output format (no extra fields, no prose):\n" +
-        //     "{\n" +
-        //     "  \"detections\": [\n" +
-        //     "    [x1, y1, \"artifact-id-1\"],\n" +
-        //     "    [x2, y2, \"artifact-id-2\"],\n" +
-        //     "    ...\n" +
-        //     "  ]\n" +
-        //     "}\n\n" +
-        //     "Notes:\n" +
-        //     "  • Coordinates must be integers.\n" +
-        //     "  • Ensure you only reference ids from the provided list.\n" +
-        //     "  • Do not include any other keys or commentary.\n";
-
         String generateContentUrl = apiUrl + "/v1beta/models/" + apiModel + ":generateContent?key=" + apiKey;
         String generateRequestJson = "{ \"contents\": [{ \"parts\": [";
 
-        String prompt = "You are an image analysis assistant. Given the following image and a list of reference artifacts, identify which reference artifacts appear in the image and provide their center coordinates.\n\n" +
-                        "Reference Artifacts:\n";
+        String prompt = "Reference Artifacts:\n";
     
         for (Map.Entry<Long, ArtifactInfoTemp> entry : artifactInfoTemp.entrySet()) {
             Long artifactId = entry.getKey();
@@ -111,45 +90,38 @@ public class LLMService {
             
             System.out.println("Artifact ID: " + artifactId);
             System.out.println("Artifact Name: " + artifactInfo.getName());
-            // { \\\"file_data\\\":
+            
             prompt += "- ID: " + artifactId + ", Image URI: " + artifactInfo.getLlmUpload().getLlmPhotoUrl() + ", Mime Type: " + artifactInfo.getLlmUpload().getLlmMimeType() + "\n";
             generateRequestJson += "{ \"file_data\": { \"mime_type\": \"" + artifactInfo.getLlmUpload().getLlmMimeType() + "\", \"file_uri\": \"" + artifactInfo.getLlmUpload().getLlmPhotoUrl() + "\" } },";
         }
 
         String inlineMimeType = multipartFile.getContentType();
-
         generateRequestJson += "{ \"inline_data\": { \"mime_type\": \"" + inlineMimeType + "\", \"data\": \"" + Base64.getEncoder().encodeToString(multipartFile.getBytes()) + "\" } },";
         
         prompt += "\nTask:\n" +
-                  "1. Detect which of the reference artifacts are present in the 'Image to analyze'.\n" +
-                  "2. For each detected artifact, provide its center pixel coordinates [x, y] in the 'Image to analyze' normalized to 0-1000.\n" +
-                  "3. Return a JSON object in the following format:\n" +
-                  "{\n" +
-                  "  \"detections\": [\n" +
-                  "    {\"id\": \"artifact-id-1\", \"coordinates\": [x1, y1]},\n" +
-                  "    {\"id\": \"artifact-id-2\", \"coordinates\": [x2, y2]},\n" +
-                  "    ...\n" +
-                  "  ]\n" +
-                  "}\n" +
-                  "4. If no reference artifacts are found, return {\"detections\": []}.";
+                "1. Detect which of the reference artifacts are present in the Image to analyze. (the inline picture)\n" +
+                "2. For each detected artifact, provide its center pixel coordinates [x, y] in the Image to analyze normalized to 0-1000.\n" +
+                "3. Return a JSON object in the following format:\n" +
+                "{\n" +
+                "  detections: [\n" +
+                "    {id: artifact-id-1, coordinates: [x1, y1]},\n" +
+                "    {id: artifact-id-2, coordinates: [x2, y2]},\n" +
+                "    ...\n" +
+                "  ]\n" +
+                "}\n" +
+                "4. If no reference artifacts are found, return {detections: []}.";
 
-        generateRequestJson += "{ \"text\": \"Caption the images one by one. And give me the respective file_uri that I pass in the file_data argument before the caption in a JSON object.\" }] }] }";
-    
+        generateRequestJson += "{ \"text\": \"" + prompt + "\" }]}]}";
 
         RequestBody generateBody = RequestBody.create(
             generateRequestJson, MediaType.parse("application/json")
         );
-
-        // System.out.println("Generate content Request JSON: " + generateRequestJson);
-        System.out.println("Prompt: " + prompt);
     
         Request generateRequest = new Request.Builder()
             .url(generateContentUrl)
             .post(generateBody)
             .build();
     
-        // System.out.println("Curl: curl -X POST " + generateContentUrl + " -H \"Content-Type: application/json\" -d '" + generateRequestJson + "'");
-
         tic();
         try (Response response = this.client.newCall(generateRequest).execute()) {
             if (!response.isSuccessful()) {
