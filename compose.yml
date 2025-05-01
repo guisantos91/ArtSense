@@ -32,6 +32,9 @@ services:
           "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
           "spring.jpa.hibernate.ddl-auto" : "update"
         }'
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_API_URL: ${GEMINI_API_URL}
+      GEMINI_API_MODEL: ${GEMINI_API_MODEL}
     ports:
       - "${BACKEND_LOCAL_PORT}:${BACKEND_CONTAINER_PORT}"
     volumes:
