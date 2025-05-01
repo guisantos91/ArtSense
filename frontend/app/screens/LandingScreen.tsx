@@ -4,13 +4,12 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Pressable,
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-const StartScreen = () => {
+const LandingScreen = () => {
   const router = useRouter();
 
   return (
@@ -67,4 +66,4 @@ const StartScreen = () => {
   );
 };
 
-export default StartScreen;
+export default LandingScreen;

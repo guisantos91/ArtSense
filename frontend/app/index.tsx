@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { useFonts } from "expo-font";
 import { StatusBar } from "react-native";
-import StartScreen from "./screens/StartScreen";
+import LandingScreen from "./screens/LandingScreen";
 
 export default function Index() {
   const [fontsLoaded] = useFonts({
@@ -24,7 +24,7 @@ export default function Index() {
         translucent
       />
 
-      <StartScreen />
+      <LandingScreen />
     </>
   );
 }
