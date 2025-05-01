@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -98,9 +99,11 @@ public class LLMService {
         //     "  • Ensure you only reference ids from the provided list.\n" +
         //     "  • Do not include any other keys or commentary.\n";
 
-
         String generateContentUrl = apiUrl + "/v1beta/models/" + apiModel + ":generateContent?key=" + apiKey;
         String generateRequestJson = "{ \"contents\": [{ \"parts\": [";
+
+        String prompt = "You are an image analysis assistant. Given the following image and a list of reference artifacts, identify which reference artifacts appear in the image and provide their center coordinates.\n\n" +
+                        "Reference Artifacts:\n";
     
         for (Map.Entry<Long, ArtifactInfoTemp> entry : artifactInfoTemp.entrySet()) {
             Long artifactId = entry.getKey();
@@ -109,23 +112,43 @@ public class LLMService {
             System.out.println("Artifact ID: " + artifactId);
             System.out.println("Artifact Name: " + artifactInfo.getName());
             // { \\\"file_data\\\":
+            prompt += "- ID: " + artifactId + ", Image URI: " + artifactInfo.getLlmUpload().getLlmPhotoUrl() + ", Mime Type: " + artifactInfo.getLlmUpload().getLlmMimeType() + "\n";
             generateRequestJson += "{ \"file_data\": { \"mime_type\": \"" + artifactInfo.getLlmUpload().getLlmMimeType() + "\", \"file_uri\": \"" + artifactInfo.getLlmUpload().getLlmPhotoUrl() + "\" } },";
         }
 
-        generateRequestJson += "{ \"text\": \"Caption the images one by one.\" }] }] }";
+        String inlineMimeType = multipartFile.getContentType();
+
+        generateRequestJson += "{ \"inline_data\": { \"mime_type\": \"" + inlineMimeType + "\", \"data\": \"" + Base64.getEncoder().encodeToString(multipartFile.getBytes()) + "\" } },";
+        
+        prompt += "\nTask:\n" +
+                  "1. Detect which of the reference artifacts are present in the 'Image to analyze'.\n" +
+                  "2. For each detected artifact, provide its center pixel coordinates [x, y] in the 'Image to analyze' normalized to 0-1000.\n" +
+                  "3. Return a JSON object in the following format:\n" +
+                  "{\n" +
+                  "  \"detections\": [\n" +
+                  "    {\"id\": \"artifact-id-1\", \"coordinates\": [x1, y1]},\n" +
+                  "    {\"id\": \"artifact-id-2\", \"coordinates\": [x2, y2]},\n" +
+                  "    ...\n" +
+                  "  ]\n" +
+                  "}\n" +
+                  "4. If no reference artifacts are found, return {\"detections\": []}.";
+
+        generateRequestJson += "{ \"text\": \"Caption the images one by one. And give me the respective file_uri that I pass in the file_data argument before the caption in a JSON object.\" }] }] }";
     
+
         RequestBody generateBody = RequestBody.create(
             generateRequestJson, MediaType.parse("application/json")
         );
 
-        System.out.println("Generate content Request JSON: " + generateRequestJson);
+        // System.out.println("Generate content Request JSON: " + generateRequestJson);
+        System.out.println("Prompt: " + prompt);
     
         Request generateRequest = new Request.Builder()
             .url(generateContentUrl)
             .post(generateBody)
             .build();
     
-        System.out.println("Curl: curl -X POST " + generateContentUrl + " -H \"Content-Type: application/json\" -d '" + generateRequestJson + "'");
+        // System.out.println("Curl: curl -X POST " + generateContentUrl + " -H \"Content-Type: application/json\" -d '" + generateRequestJson + "'");
 
         tic();
         try (Response response = this.client.newCall(generateRequest).execute()) {
@@ -143,7 +166,7 @@ public class LLMService {
 
     }
 
-    public LLMUpload uploadFile(String photo, String contentType) throws IOException {
+    public LLMUpload uploadFile(String id, String photo, String contentType) throws IOException {
         MultipartFile multipartFile;
         try {
             multipartFile = downloadImageAsMultipartFile(photo, contentType);
@@ -157,8 +180,8 @@ public class LLMService {
         // Step 1: Get file metadata
         String mimeType = multipartFile.getContentType();
         long fileSize = multipartFile.getSize();
-        String displayName = "IMAGE";
-        System.out.println("File name: " + multipartFile.getOriginalFilename());
+        String displayName = id;
+        System.out.println("File name: " + id);
         System.out.println("File size: " + fileSize);
         System.out.println("MIME type: " + mimeType);
     
