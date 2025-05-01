@@ -76,13 +76,25 @@ public class DataLoader implements CommandLineRunner {
         Artifact monaLisa = null;
         if (artifactRepository.findByName("Mona Lisa").isEmpty()) {
             String photoUrl = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.pariscityvision.com%2Flibrary%2Fimage%2F5449.jpg&f=1&nofb=1&ipt=1218a5f666566c4dbfdd75535848cacbaf3386dc208b26a1ceb1238640627355";
-            LLMUpload llmupload = this.llmService.uploadFile(photoUrl);
+            LLMUpload llmupload = this.llmService.uploadFile(photoUrl, "image/jpeg");
             monaLisa = new Artifact("Mona Lisa", 1503, "Louvre Museum", "Portrait of Lisa Gherardini.", "Oil on poplar panel",photoUrl, "77 cm × 53 cm", daVinci, llmupload.getLlmPhotoUrl(), llmupload.getLlmMimeType());
             artifactRepository.save(monaLisa);
             System.out.println("Created Mona Lisa artifact.");
         } else {
             monaLisa = artifactRepository.findByName("Mona Lisa").get(); // Assuming name is unique
             System.out.println("Mona Lisa artifact already exists.");
+        }
+
+        Artifact starryNight = null;
+        if (artifactRepository.findByName("Starry Night").isEmpty()) {
+            String photoUrl = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F2997.jpg&f=1&nofb=1&ipt=b8189d63acc69fe645e36e1c82d232840251c6cf68797130ceb063842dd7e120";
+            LLMUpload llmupload = this.llmService.uploadFile(photoUrl, "image/jpeg");
+            starryNight = new Artifact("Starry Night", 1889, "Museum of Modern Art", "A swirling night sky over a quiet town.", "Oil on canvas", photoUrl, "73.7 cm × 92.1 cm", daVinci, llmupload.getLlmPhotoUrl(), llmupload.getLlmMimeType());
+            artifactRepository.save(starryNight);
+            System.out.println("Created Starry Night artifact.");
+        } else {
+            starryNight = artifactRepository.findByName("Starry Night").get(); // Assuming name is unique
+            System.out.println("Starry Night artifact already exists.");
         }
 
         // --- Create Exhibition ---
@@ -96,7 +108,7 @@ public class DataLoader implements CommandLineRunner {
                     LocalDateTime.now().minusDays(30),
                     LocalDateTime.now().plusDays(60),
                     louvre,
-                    List.of(monaLisa)
+                    List.of(monaLisa, starryNight) 
             );
             exhibitionRepository.save(renaissanceExhibition);
             System.out.println("Created Renaissance Masterpieces exhibition.");

@@ -2,21 +2,11 @@ package artsense.backend.dto;
 
 public class ArtifactInfoTemp {
     private String name;
-    private String photoUrl;
-    private String mimeType;
+    private LLMUpload llmUpload;
 
-    public ArtifactInfoTemp(String name, String photoUrl, String mimeType) {
+    public ArtifactInfoTemp(String name, LLMUpload llmUpload) {
         this.name = name;
-        this.photoUrl = photoUrl;
-        this.mimeType = mimeType;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+        this.llmUpload = llmUpload;
     }
 
     public String getName() {
@@ -27,11 +17,11 @@ public class ArtifactInfoTemp {
         this.name = name;
     }
 
-    public String getPhotoUrl() {
-        return photoUrl;
+    public LLMUpload getLlmUpload() {
+        return llmUpload;
     }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
+    public void setLlmUpload(LLMUpload llmUpload) {
+        this.llmUpload = llmUpload;
     }
 }
