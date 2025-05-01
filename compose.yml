@@ -1,0 +1,16 @@
+name: art-sense
+
+services:
+
+  database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: backend_password
+      POSTGRES_DB: relational_db
+    volumes:
+      - postgres_db_data:${DATABASE_VOLUME}
+    restart: on-failure
+    networks:
+      - art-sense-network
+
