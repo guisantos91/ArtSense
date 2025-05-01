@@ -96,7 +96,7 @@ const SignUpScreen = () => {
               </View>
 
               <TouchableOpacity
-                onPress={() => router.push("./MuseumScreen")}
+                onPress={() => router.push("./PhotoScreen")}
                 className="mt-[12%] h-[42px] w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
                 activeOpacity={0.8}
               >

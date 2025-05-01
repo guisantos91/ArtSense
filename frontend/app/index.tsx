@@ -1,4 +1,3 @@
-import { Text, View } from "react-native";
 import { useFonts } from "expo-font";
 import { StatusBar } from "react-native";
 import StartScreen from "./screens/StartScreen";
