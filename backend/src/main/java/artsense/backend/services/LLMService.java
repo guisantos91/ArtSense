@@ -1,11 +1,13 @@
 package artsense.backend.services;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import artsense.backend.dto.LLMUpload;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,8 +26,60 @@ public class LLMService {
     @Value("${llm.api.model}")
     private String apiModel;
 
-    public String locateArtifacts(MultipartFile multipartFile) throws IOException {
+    // tic tac to save the time used
+    private long startTime;
+    
+    private void tic() {
+        startTime = System.currentTimeMillis();
+    }
+
+    private long tac() {
+        return System.currentTimeMillis() - startTime;
+    }
+
+    private OkHttpClient client;
+
+    public LLMService() {
+        this.client = new OkHttpClient();
+    }
+
+    public String locateArtifacts(MultipartFile multipartFile, List<LLMUpload> artifactsUpload) throws IOException {
         System.out.println("LLMService: locateArtifacts called");
+    
+        // Step 4: Generate content using the uploaded file
+        String generateContentUrl = apiUrl + "/v1beta/models/" + apiModel + ":generateContent?key=" + apiKey;
+        String generateRequestJson = "{ \"contents\": [{ \"parts\": ["
+            + "{ \"file_data\": { \"mime_type\": \"" + mimeType + "\", \"file_uri\": \"" + fileUri + "\" } },"
+            + "{ \"text\": \"Caption this image.\" }"
+            + "] }] }";
+    
+        RequestBody generateBody = RequestBody.create(
+            generateRequestJson, MediaType.parse("application/json")
+        );
+    
+        Request generateRequest = new Request.Builder()
+            .url(generateContentUrl)
+            .post(generateBody)
+            .build();
+    
+        tic();
+        try (Response response = client.newCall(generateRequest).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to generate content: " + response);
+            }
+            System.out.println("Time taken to generate content: " + tac() + " ms");
+
+            return response.body().string();
+        }
+
+    }
+
+    public LLMUpload uploadFile(String photo) throws IOException {
+
+        MultipartFile multipartFile = null; // TODO
+
+        System.out.println("LLMService: uploadFile called");
+
         OkHttpClient client = new OkHttpClient();
 
         // Step 1: Get file metadata
@@ -45,13 +99,10 @@ public class LLMService {
         RequestBody metadataBody = RequestBody.create(
             metadataJson, MediaType.parse("application/json")
         );
-
-        //https://generativelanguage.googleapis.com/upload/v1beta/files
-        //https://generativelanguage.googleapis.com/v1beta/models/upload/v1beta/files?key=AIzaSyC2wqvqjHiegnGd9C-vRIdLrr-yDKXw3BQ
     
         Request startUploadRequest = new Request.Builder()
             .url(startUploadUrl)
-            .addHeader("X-Goog-Upload-Protocol", "resumable")
+            .addHeader("X-Goog-Upload-Protacol", "resumable")
             .addHeader("X-Goog-Upload-Command", "start")
             .addHeader("X-Goog-Upload-Header-Content-Length", String.valueOf(fileSize))
             .addHeader("X-Goog-Upload-Header-Content-Type", mimeType)
@@ -85,6 +136,7 @@ public class LLMService {
             .build();
     
         String fileUri;
+        tic();
         try (Response response = client.newCall(uploadRequest).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Failed to upload file: " + response);
@@ -96,32 +148,12 @@ public class LLMService {
                 .path("uri")
                 .asText();
         }
+        System.out.println("Time taken to upload: " + tac() + " ms");
 
         System.out.println("File URI: " + fileUri);
-    
-        // Step 4: Generate content using the uploaded file
-        String generateContentUrl = apiUrl + "/v1beta/models/" + apiModel + ":generateContent?key=" + apiKey;
-        String generateRequestJson = "{ \"contents\": [{ \"parts\": ["
-            + "{ \"file_data\": { \"mime_type\": \"" + mimeType + "\", \"file_uri\": \"" + fileUri + "\" } },"
-            + "{ \"text\": \"Caption this image.\" }"
-            + "] }] }";
-    
-        RequestBody generateBody = RequestBody.create(
-            generateRequestJson, MediaType.parse("application/json")
-        );
-    
-        Request generateRequest = new Request.Builder()
-            .url(generateContentUrl)
-            .post(generateBody)
-            .build();
-    
-        try (Response response = client.newCall(generateRequest).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Failed to generate content: " + response);
-            }
-            return response.body().string();
-        }
 
+        return new LLMUpload(fileUri, mimeType);
     }
+
 
 }

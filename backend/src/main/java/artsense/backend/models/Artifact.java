@@ -21,13 +21,15 @@ public class Artifact {
     private String material;
     private String photoUrl;
     private String dimensions;
+    private String llmPhotoUrl;
+    private String llmMimeType;
 
     @ManyToOne
     @JoinColumn(name = "authorId")
     private Author author;
     
     public Artifact(String name, int year, String location, String description, String material, String photoUrl, String dimensions,
-            Author author) {
+            Author author, String llmPhotoUrl, String llmMimeType) {
         this.name = name;
         this.year = year;
         this.location = location;
@@ -36,6 +38,8 @@ public class Artifact {
         this.photoUrl = photoUrl;
         this.dimensions = dimensions;
         this.author = author;
+        this.llmPhotoUrl = llmPhotoUrl;
+        this.llmMimeType = llmMimeType;
     }
 
     public Artifact() {
@@ -94,6 +98,21 @@ public class Artifact {
     public void setAuthor(Author author) {
         this.author = author;
     }
+    public String getLlmPhotoUrl() {
+        return llmPhotoUrl;
+    }
+
+    public void setLlmPhotoUrl(String llmPhotoUrl) {
+        this.llmPhotoUrl = llmPhotoUrl;
+    }
+
+    public String getLlmMimeType() {
+        return llmMimeType;
+    }
+
+    public void setLlmMimeType(String llmMimeType) {
+        this.llmMimeType = llmMimeType;
+    }
     @Override
     public String toString() {
         return "Artifact{" +
@@ -106,6 +125,8 @@ public class Artifact {
                 ", photoUrl='" + photoUrl + '\'' +
                 ", dimensions='" + dimensions + '\'' +
                 ", author=" + author +
+                ", llmPhotoUrl='" + llmPhotoUrl + '\'' +
+                ", llmMimeType='" + llmMimeType + '\'' +
                 '}';
     }
 
