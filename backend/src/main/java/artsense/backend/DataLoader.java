@@ -2,6 +2,9 @@ package artsense.backend;
 
 import artsense.backend.models.*;
 import artsense.backend.repositories.*;
+import artsense.backend.services.LLMService;
+import artsense.backend.dto.LLMUpload;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +19,20 @@ public class DataLoader implements CommandLineRunner {
     private final AuthorRepository authorRepository; // Corrected typo from AuthorReprository
     private final ArtifactRepository artifactRepository;
     private final ExhibitionRepository exhibitionRepository;
+    private final LLMService llmService;
 
     public DataLoader(UserRepository userRepository,
                       MuseumRepository museumRepository,
                       AuthorRepository authorRepository, // Corrected typo
                       ArtifactRepository artifactRepository,
-                      ExhibitionRepository exhibitionRepository) {
+                      ExhibitionRepository exhibitionRepository,
+                      LLMService llmService) {
         this.userRepository = userRepository;
         this.museumRepository = museumRepository;
         this.authorRepository = authorRepository;
         this.artifactRepository = artifactRepository;
         this.exhibitionRepository = exhibitionRepository;
+        this.llmService = llmService;
     }
 
     @Override
@@ -69,7 +75,9 @@ public class DataLoader implements CommandLineRunner {
         // --- Create Artifact ---
         Artifact monaLisa = null;
         if (artifactRepository.findByName("Mona Lisa").isEmpty()) {
-            monaLisa = new Artifact("Mona Lisa", 1503, "Louvre Museum", "Portrait of Lisa Gherardini.", "Oil on poplar panel", "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.pariscityvision.com%2Flibrary%2Fimage%2F5449.jpg&f=1&nofb=1&ipt=1218a5f666566c4dbfdd75535848cacbaf3386dc208b26a1ceb1238640627355", "77 cm × 53 cm", daVinci);
+            String photoUrl = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.pariscityvision.com%2Flibrary%2Fimage%2F5449.jpg&f=1&nofb=1&ipt=1218a5f666566c4dbfdd75535848cacbaf3386dc208b26a1ceb1238640627355";
+            LLMUpload llmupload = this.llmService.uploadFile(photoUrl);
+            monaLisa = new Artifact("Mona Lisa", 1503, "Louvre Museum", "Portrait of Lisa Gherardini.", "Oil on poplar panel",photoUrl, "77 cm × 53 cm", daVinci, llmupload.getLlmPhotoUrl(), llmupload.getLlmMimeType());
             artifactRepository.save(monaLisa);
             System.out.println("Created Mona Lisa artifact.");
         } else {
