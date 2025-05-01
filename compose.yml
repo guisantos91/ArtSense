@@ -1,0 +1,48 @@
+name: art-sense
+
+services:
+
+  database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: backend_password
+      POSTGRES_DB: relational_db
+    volumes:
+      - postgres_db_data:${DATABASE_VOLUME}
+    restart: on-failure
+    networks:
+      - art-sense-network
+
+  backend:
+    depends_on: 
+      database:
+        condition: service_started
+    build:
+      context: "${BACKEND_CONTEXT_PATH}"
+      dockerfile: "${BACKEND_DOCKERFILE}"
+    environment:
+      BACKEND_API_PREFIX: ${BACKEND_API_PREFIX}
+      SPRING_APPLICATION_JSON: 
+        '{
+          "spring.datasource.url" : "jdbc:postgresql://${DATABASE_IP}:${DATABASE_CONTAINER_PORT}/${POSTGRES_DB}",
+          "spring.datasource.username" : "${POSTGRES_USER}",
+          "spring.datasource.password" : "${POSTGRES_PASSWORD}",
+          "spring.jpa.show-sql" : "true",
+          "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+          "spring.jpa.hibernate.ddl-auto" : "update"
+        }'
+    ports:
+      - "${BACKEND_LOCAL_PORT}:${BACKEND_CONTAINER_PORT}"
+    volumes:
+      - .m2:${M2_BACKEND_VOLUME}    
+    restart: on-failure
+    networks:
+      - art-sense-network
+
+networks:
+  art-sense-network:
+    driver: bridge
+
+volumes:    
+  postgres_db_data:
