@@ -5,5 +5,14 @@ export type {
 
 export {
     logInAPI,
-    signUpAPI
+    signUpAPI,
+    getMuseumsAPI,
+    getExhibitionsAPI,
+    getExhibitionByMuseumAPI
+} from './api-consumer';
+
+export type {
+    Museum,
+    Exhibition,
+    ExhibitionWithoutMuseum
 } from './api-consumer';

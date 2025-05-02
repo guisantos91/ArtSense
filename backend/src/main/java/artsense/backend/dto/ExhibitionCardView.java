@@ -5,13 +5,15 @@ import java.time.LocalDateTime;
 public class ExhibitionCardView {
     private Long exhibitionId;
     private String name;
+    private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String photoUrl;
 
-    public ExhibitionCardView(Long exhibitionId, String name, LocalDateTime startDate, LocalDateTime endDate, String photoUrl) {
+    public ExhibitionCardView(Long exhibitionId, String name, String description, LocalDateTime startDate, LocalDateTime endDate, String photoUrl) {
         this.exhibitionId = exhibitionId;
         this.name = name;
+        this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.photoUrl = photoUrl;
@@ -23,6 +25,14 @@ public class ExhibitionCardView {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getStartDate() {

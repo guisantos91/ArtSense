@@ -17,10 +17,11 @@ public class MuseumService {
         this.museumRepository = museumRepository;
     }
 
-    public List<MuseumCardView> getAllMuseums() {
+    public List<MuseumCardView> getAllMuseums(String museumStartsWith) {
         List<Museum> museums = museumRepository.findAll();
         return museums.stream()
-                .map(museum -> new MuseumCardView(museum.getMuseumId(), museum.getPhotoUrl(), museum.getName(), museum.getLocation()))
+                .filter(museum -> museumStartsWith == null|| museum.getName().toLowerCase().startsWith(museumStartsWith.toLowerCase()))
+                .map(museum -> new MuseumCardView(museum.getMuseumId(), museum.getPhotoUrl(), museum.getName(), museum.getLocation(), museum.getDescription()))
                 .toList();
     }
 

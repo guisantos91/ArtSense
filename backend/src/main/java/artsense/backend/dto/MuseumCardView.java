@@ -5,12 +5,22 @@ public class MuseumCardView {
     private String photoUrl;
     private String name;
     private String location;
+    private String description;
 
-    public MuseumCardView(Long museumId, String photoUrl, String name, String location) {
+    public MuseumCardView(Long museumId, String photoUrl, String name, String location, String description) {
         this.museumId = museumId;
         this.photoUrl = photoUrl;
         this.name = name;
         this.location = location;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Long getMuseumId() {

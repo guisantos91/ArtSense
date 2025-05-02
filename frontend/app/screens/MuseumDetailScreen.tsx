@@ -13,7 +13,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function MuseumDetailScreen() {
     const router = useRouter();
-    const { name, image, description } = useLocalSearchParams<{
+    const { museumId, name, image, description } = useLocalSearchParams<{
+        museumId: string;
         name: string;
         image?: string;
         description: string;
@@ -23,15 +24,15 @@ export default function MuseumDetailScreen() {
         <LinearGradient colors={['#202020', '#252525']} style={{ flex: 1 }}>
             <SafeAreaView className="flex-1 bg-primary">
                 <View className="flex-1 w-[95%] self-center">
-                    <Image
-                        source={require('../../assets/images/imgs/logo.png')}
-                        className="mt-[2%] w-full h-[6%] rounded-full"
-                        resizeMode="contain"
-                    />
                     <ScrollView
-                        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+                        contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
                         keyboardShouldPersistTaps="handled"
                     >
+                        <Image
+                            source={require('../../assets/images/imgs/logo.png')}
+                            className="mt-[2%] w-full h-[6%] rounded-full"
+                            resizeMode="contain"
+                        />
                         <View className="flex-row items-center mt-[4%] px-[2%]">
                             <TouchableOpacity onPress={() => router.back()} className="p-[2%]">
                                 <Ionicons name="arrow-back" size={24} color="#FFF" />
@@ -62,7 +63,12 @@ export default function MuseumDetailScreen() {
                         </Text>
 
                         <TouchableOpacity
-                            onPress={() => router.push('./ExhibitionScreen')}
+                            onPress={() => router.push({
+                                pathname: './ExhibitionScreen',
+                                params: {
+                                    museumId: museumId,
+                                }
+                            })}
                             className="mt-12 h-10 w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
                             activeOpacity={0.8}
                         >
