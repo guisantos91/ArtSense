@@ -1,3 +1,4 @@
+import React from "react";
 import { useFonts } from "expo-font";
 import { StatusBar } from "react-native";
 import LandingScreen from "./screens/LandingScreen";
