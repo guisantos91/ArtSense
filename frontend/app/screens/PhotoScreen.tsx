@@ -37,16 +37,19 @@ const PhotoScreen = () => {
   const [selectedPoint, setSelectedPoint] = useState<ArtifactPoint | null>(
     null
   );
+  const [sheetIndex, setSheetIndex] = useState(0);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["40%"], []);
+  const snapPoints = useMemo(() => ["30%", "85%"], []);
+
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    setSheetIndex(index);
   }, []);
 
   const openBottomSheet = (point: ArtifactPoint) => {
     setSelectedPoint(point);
-    bottomSheetRef.current?.expand();
+    bottomSheetRef.current?.snapToIndex(0);
+    setSheetIndex(0);
   };
 
   const points: ArtifactPoint[] = [
@@ -144,29 +147,63 @@ const PhotoScreen = () => {
               ref={bottomSheetRef}
               index={-1}
               snapPoints={snapPoints}
-              onChange={handleSheetChanges}
+              onChange={(index) => {
+                requestAnimationFrame(() => setSheetIndex(index));
+              }}
               enablePanDownToClose={true}
-              handleIndicatorStyle={{ backgroundColor: "#ffffff" }}
+              handleComponent={() => null}
               backgroundStyle={{
-                backgroundColor: "#202020",
-                borderRadius: 30,
-                backgroundImage: require("../../assets/images/imgs/exhibition.png"),
+                backgroundColor: "transparent",
+                borderRadius: 0,
               }}
             >
-              <BottomSheetView className="flex-1 overflow-hidden">
+              <BottomSheetView className="flex-1 overflow-hidden bg-primary rounded-t-[40]">
                 <ImageBackground
                   source={require("../../assets/images/imgs/exhibition.png")}
                   resizeMode="cover"
-                  className="w-full h-full p-8"
+                  className="w-full h-full pt-3 px-8"
                   imageStyle={{ opacity: 0.6 }}
                 >
-                  {selectedPoint && (
-                    <View className="flex-1 justify-end items-center">
-                      <Text className="text-white text-2xl font-bold mb-6 text-center">
+                  <View className="items-center justify-center">
+                    <View
+                      style={{
+                        width: 40,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: "white",
+                        opacity: 0.4,
+                      }}
+                    />
+                  </View>
+
+                  {sheetIndex === 1 && (
+                    <View className="absolute top-4 left-4 z-10">
+                      <TouchableOpacity
+                        onPress={() => {
+                          bottomSheetRef.current?.close();
+                          setSheetIndex(0);
+                        }}
+                        className="m-[10%]"
+                      >
+                        <AntDesign name="arrowleft" size={32} color="#D9D8DE" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  {selectedPoint && sheetIndex === 0 && (
+                    <View className="flex-1 items-center justify-start space-y-4">
+                      <Text className="text-white text-4xl font-ebgaramond text-center mt-[25%]">
                         {selectedPoint.artifactName}
                       </Text>
-                      <TouchableOpacity className="bg-white px-6 py-3 rounded-xl shadow mb-6">
-                        <Text className="text-black font-bold text-lg">
+
+                      <TouchableOpacity
+                        className="bg-white px-4 py-2 rounded-xl shadow mt-2"
+                        onPress={() => {
+                          bottomSheetRef.current?.snapToIndex(1);
+                          setSheetIndex(1);
+                        }}
+                      >
+                        <Text className="text-primary text-lg">
                           See Details
                         </Text>
                       </TouchableOpacity>
@@ -177,45 +214,51 @@ const PhotoScreen = () => {
             </BottomSheet>
           </ImageBackground>
         ) : (
-          <CameraView style={{ flex: 1 }} ref={ref} facing={facing}>
-            <View className="flex-row items-center justify-between mt-[4%] px-[6%]">
-              <View className="items-start w-14">
+          <View className="flex-1 relative">
+            <CameraView style={{ flex: 1 }} ref={ref} facing={facing} />
+
+            <View className="absolute inset-0">
+              <View className="flex-row items-center justify-between mt-[4%] px-[6%]">
+                <View className="items-start w-14">
+                  <TouchableOpacity
+                    onPress={() => router.push("./MuseumScreen")}
+                    className="bg-white p-2 rounded-full"
+                    activeOpacity={0.8}
+                  >
+                    <AntDesign name="close" size={32} color="black" />
+                  </TouchableOpacity>
+                </View>
+
+                <View className="flex-1 items-center self-center">
+                  <Image
+                    source={require("../../assets/images/imgs/logo_ArtSense.png")}
+                    className="self-center"
+                    style={{ width: 160, resizeMode: "contain" }}
+                  />
+                </View>
+
+                <View className="w-14" />
+              </View>
+
+              <View className="flex-1 flex-col justify-end items-center mb-16 space-y-4">
+                <View className="flex-row items-center space-x-2 p-3 bg-senary rounded-xl mb-5">
+                  <Text className="text-black font-ebgaramond text-lg mr-2">
+                    Point the camera to a section with artfacts
+                  </Text>
+                  <Entypo name="camera" size={24} color="black" />
+                </View>
+
                 <TouchableOpacity
-                  onPress={() => router.push("./MuseumScreen")}
-                  className="bg-white p-2 rounded-full"
-                  activeOpacity={0.8}
+                  onPress={takePicture}
+                  className="w-24 h-24 rounded-full border-4 border-white items-center justify-center"
                 >
-                  <AntDesign name="close" size={32} color="black" />
+                  <View className="w-20 h-20 bg-white rounded-full" />
                 </TouchableOpacity>
               </View>
-
-              <View className="flex-1 items-center self-center">
-                <Image
-                  source={require("../../assets/images/imgs/logo_ArtSense.png")}
-                  className="self-center"
-                  style={{ width: 160, resizeMode: "contain" }}
-                />
-              </View>
-              <View className="w-14" />
             </View>
-
-            <View className="flex-1 flex-col justify-end items-center mb-16 space-y-4">
-              <View className="flex-row items-center space-x-2 p-3 bg-senary rounded-xl mb-5">
-                <Text className="text-black font-ebgaramond text-lg mr-2">
-                  Point the camera to a section with artfacts
-                </Text>
-                <Entypo name="camera" size={24} color="black" />
-              </View>
-
-              <TouchableOpacity
-                onPress={takePicture}
-                className="w-24 h-24 rounded-full border-4 border-white items-center justify-center"
-              >
-                <View className="w-20 h-20 bg-white rounded-full" />
-              </TouchableOpacity>
-            </View>
-          </CameraView>
+          </View>
         )}
+
         {isLoading && <LoadingOverlay />}
       </SafeAreaView>
     </GestureHandlerRootView>
