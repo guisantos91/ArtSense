@@ -45,7 +45,7 @@ const LoginScreen = () => {
             />
 
             <View className="mt-[4%] w-[98%] bg-octonary rounded-[72px] px-8 pb-10">
-              <Text className="mt-[15%] w-full text-quinary font-ebgaramond text-6xl">
+              <Text className="mt-[15%] w-full text-quinary font-cormorant text-6xl">
                 Login
               </Text>
 

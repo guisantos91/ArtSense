@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ArtSense",
-    "slug": "ArtSense",
+    "name": "frontend",
+    "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -34,13 +34,21 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "API_BASE_URL": "http://172.20.10.3:8080/api/v1"
+      "API_BASE_URL": "http://10.2.3.177:8080/api/v1"
     }
   }
 }

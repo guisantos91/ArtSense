@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+} from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ExhibitionDetailScreen() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function ExhibitionDetailScreen() {
     exhibitionId: string;
   }>();
 
-  console.log('detail params:', { image, name, description });
+  console.log("detail params:", { image, name, description });
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -31,9 +31,9 @@ export default function ExhibitionDetailScreen() {
         resizeMode="cover"
       >
         <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.8)', '#000']}
-            locations={[0, 0.5, 1]}
-            style={StyleSheet.absoluteFill}
+          colors={["transparent", "rgba(0,0,0,0.8)", "#000"]}
+          locations={[0, 0.5, 1]}
+          style={StyleSheet.absoluteFill}
         />
 
         <View className="absolute top-4 left-4 right-4 flex-row justify-between items-center px-4 h-16">
@@ -44,7 +44,7 @@ export default function ExhibitionDetailScreen() {
             <Ionicons name="arrow-back" size={24} color="#CFCFCF" />
           </TouchableOpacity>
           <Image
-            source={require('../../assets/images/imgs/logo.png')}
+            source={require("../../assets/images/imgs/logo.png")}
             className="w-32 h-8"
             resizeMode="contain"
           />
@@ -60,7 +60,7 @@ export default function ExhibitionDetailScreen() {
           </Text>
 
           <TouchableOpacity
-            onPress={() => router.push('./LoginScreen')}
+            onPress={() => router.push("./PhotoScreen")}
             className="mt-6 w-[62%] h-12 bg-senary rounded-[14px] items-center justify-center mb-8 self-center"
             activeOpacity={0.8}
           >
