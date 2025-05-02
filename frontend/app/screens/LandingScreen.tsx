@@ -52,7 +52,7 @@ const LandingScreen = () => {
             activeOpacity={0.8}
           >
             <Text className="text-septenary font-medium text-lg leading-5 font-inter">
-              Let’s start!
+              Let's start!
             </Text>
           </TouchableOpacity>
         </View>
