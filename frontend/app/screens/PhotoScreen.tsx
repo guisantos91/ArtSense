@@ -10,13 +10,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { AntDesign } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
+import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ArtifactPoint {
   x: number;
@@ -26,6 +28,7 @@ interface ArtifactPoint {
 }
 
 const PhotoScreen = () => {
+  const {axiosInstance} = useAuth();
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef<CameraView>(null);
@@ -40,6 +43,7 @@ const PhotoScreen = () => {
     null
   );
   const [sheetIndex, setSheetIndex] = useState(0);
+  const [points, setPoints] = useState<ArtifactPoint[]>([]);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
@@ -51,24 +55,18 @@ const PhotoScreen = () => {
     setSheetIndex(index);
   }, []);
 
+  const { image, name, description, exhibitionId } = useLocalSearchParams<{
+      image: string;
+      name: string;
+      description: string;
+      exhibitionId: string;
+  }>();
+
   const openBottomSheet = (point: ArtifactPoint) => {
     setSelectedPoint(point);
     bottomSheetRef.current?.snapToIndex(0);
     setSheetIndex(0);
   };
-
-  const points: ArtifactPoint[] = [
-    { x: 12.0, y: 7.0, artifactId: 1, artifactName: "Mona Lisa" },
-    { x: 20.0, y: 15.0, artifactId: 2, artifactName: "Starry Night" },
-    { x: 30.0, y: 25.0, artifactId: 3, artifactName: "The Scream" },
-    {
-      x: 40.0,
-      y: 35.0,
-      artifactId: 4,
-      artifactName: "The Persistence of Memory",
-    },
-    { x: 750.0, y: 3000.0, artifactId: 5, artifactName: "The Last Supper" },
-  ];
 
   if (!permission) return <Text>Requesting for camera permission</Text>;
 
@@ -86,13 +84,51 @@ const PhotoScreen = () => {
   const takePicture = async () => {
     if (ref.current) {
       setIsLoading(true);
+      setPoints([]); 
       try {
-        const photo = await ref.current.takePictureAsync();
+        const photo = await ref.current.takePictureAsync({quality: 0.5});
         setPhotoData({
           uri: photo.uri,
           width: photo.width,
           height: photo.height,
         });
+
+        const formData = new FormData();
+        const uriParts = photo.uri.split('/');
+        const fileName = uriParts[uriParts.length - 1];
+        let fileType = fileName.split('.').pop();
+        if (fileType === 'jpg') fileType = 'jpeg';
+
+        formData.append('image', { 
+          uri: photo.uri,
+          name: fileName,
+          type: `image/${fileType}`,
+        } as any);
+
+        const response = await locateArtifactsAPI(axiosInstance, parseInt(exhibitionId), formData);
+        const backendPoints: ArtifactPointLabel[] = response.data;
+
+
+        if (backendPoints && backendPoints.length > 0) {
+          const frontendPoints: ArtifactPoint[] = backendPoints.map(p => ({
+            x: p.x,
+            y: p.y,
+            artifactId: p.artifactId, 
+            artifactName: p.name, 
+          }));
+
+          setPoints(frontendPoints); 
+          setPhotoData({
+            uri: photo.uri,
+            width: photo.width,
+            height: photo.height,
+          });
+        } else {
+          console.log("No artifacts detected by the API.");
+           setPhotoData(null);
+        }
+
+        setPoints(points);
       } catch (error) {
         console.error("Error taking a picture: ", error);
       } finally {
@@ -101,7 +137,10 @@ const PhotoScreen = () => {
     }
   };
 
-  const cancelPhoto = () => setPhotoData(null);
+  const cancelPhoto = () => {
+    setPhotoData(null);
+    setPoints([]);
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

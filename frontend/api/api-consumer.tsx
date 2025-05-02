@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { LoginCredentials, SignupCredentials } from './dto/dto';
+import { ArtifactPointLabel, LoginCredentials, SignupCredentials } from './dto/dto';
 import { ImageSourcePropType } from 'react-native';
 
 const logInAPI = async (
@@ -83,6 +83,23 @@ const getExhibitionByMuseumAPI = async (
     return response.data;
 }
 
+const locateArtifactsAPI = async (
+    axiosInstance: AxiosInstance,
+    exhibitionId: number,
+    formData: FormData
+) => {
+    const response = await axiosInstance.post<ArtifactPointLabel[]>(
+        `/exhibitions/${exhibitionId}/locate-artifacts`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
+    return response;
+}
+
 
 interface Museum {
     museumId: number;
@@ -116,7 +133,8 @@ export {
     signUpAPI,
     getMuseumsAPI,
     getExhibitionsAPI,
-    getExhibitionByMuseumAPI
+    getExhibitionByMuseumAPI,
+    locateArtifactsAPI
 }
 
 export type { Museum, Exhibition, ExhibitionWithoutMuseum };

@@ -1,6 +1,7 @@
 export type { 
     LoginCredentials, 
-    SignupCredentials
+    SignupCredentials,
+    ArtifactPointLabel
 } from './dto/dto';
 
 export {
@@ -8,7 +9,8 @@ export {
     signUpAPI,
     getMuseumsAPI,
     getExhibitionsAPI,
-    getExhibitionByMuseumAPI
+    getExhibitionByMuseumAPI,
+    locateArtifactsAPI
 } from './api-consumer';
 
 export type {

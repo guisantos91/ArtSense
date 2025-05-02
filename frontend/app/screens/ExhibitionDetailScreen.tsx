@@ -14,14 +14,25 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function ExhibitionDetailScreen() {
   const router = useRouter();
-  const { image, name, description } = useLocalSearchParams<{
+  const { image, name, description, exhibitionId } = useLocalSearchParams<{
     image: string;
     name: string;
     description: string;
     exhibitionId: string;
   }>();
 
-  console.log("detail params:", { image, name, description });
+  const handleVisitExhibition = () => {
+    router.push({
+      pathname: "./PhotoScreen",
+      params: {
+        image: image,
+        name: name,
+        description: description,
+        exhibitionId: exhibitionId,
+      }});
+  };
+
+  console.log("detail params:", { image, name, description, exhibitionId });
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -60,7 +71,7 @@ export default function ExhibitionDetailScreen() {
           </Text>
 
           <TouchableOpacity
-            onPress={() => router.push("./PhotoScreen")}
+            onPress={handleVisitExhibition}
             className="mt-6 w-[62%] h-12 bg-senary rounded-[14px] items-center justify-center mb-8 self-center"
             activeOpacity={0.8}
           >
