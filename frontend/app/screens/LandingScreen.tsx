@@ -42,7 +42,7 @@ const LandingScreen = () => {
               </Text>
 
               <TouchableOpacity 
-                onPress={() => router.push("./LoginScreen")}
+                onPress={() => router.push("./screens/LoginScreen")}
                 className="mt-5 w-[116px] h-[36px] border border-[#f0eace2e] rounded-[14px] items-center justify-center">
                 <Text className="text-undecenary font-medium text-sm leading-[18px]">
                   Explore more...
@@ -52,12 +52,12 @@ const LandingScreen = () => {
           </View>
 
           <TouchableOpacity
-            onPress={() => router.replace("./LoginScreen")}
+            onPress={() => router.replace("./screens/LoginScreen")}
             className="mt-[8%] w-[65%] h-12 bg-senary rounded-[14px] items-center justify-center"
             activeOpacity={0.8}
           >
             <Text className="text-septenary font-medium text-lg leading-5 font-inter">
-              Let’s start!
+              Let's start!
             </Text>
           </TouchableOpacity>
         </View>
