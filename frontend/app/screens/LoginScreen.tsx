@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 
 const LoginScreen = () => {
-  const {axiosInstance, login} = useAuth();
+  const {login} = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -56,7 +56,7 @@ const LoginScreen = () => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="example@email.com"
+                  placeholder="email"
                   placeholderTextColor={"#CFCFCF"}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -71,7 +71,7 @@ const LoginScreen = () => {
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="your password"
+                  placeholder="password"
                   placeholderTextColor={"#CFCFCF"}
                   secureTextEntry
                   className="bg-septenary rounded-xl px-5 py-3 text-quaternary font-inter w-[92%] self-center"
