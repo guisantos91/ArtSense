@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
+import AskBottomSheet from "../components/AskBottomSheet";
 
 interface ArtifactPoint {
   x: number;
@@ -45,7 +46,6 @@ const PhotoScreen = () => {
   const snapPoints = useMemo(() => ["30%", "93%"], []);
 
   const askSheetRef = useRef<BottomSheet>(null);
-  const askSnapPoints = useMemo(() => ["25%"], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
@@ -157,18 +157,7 @@ const PhotoScreen = () => {
               askSheetRef={askSheetRef}
             />
 
-            <BottomSheet
-              ref={askSheetRef}
-              index={-1}
-              snapPoints={askSnapPoints}
-              enablePanDownToClose
-              handleComponent={() => null}
-              backgroundStyle={{ backgroundColor: "white", borderRadius: 20 }}
-            >
-              <BottomSheetView className="flex-1 items-center justify-center">
-                <Text className="text-black text-xl">Olá</Text>
-              </BottomSheetView>
-            </BottomSheet>
+            <AskBottomSheet askSheetRef={askSheetRef} />
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
