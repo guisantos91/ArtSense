@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,23 +7,52 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import SearchBar from '../components/SearchBar';
 import ExhibitionListCard from '../components/ExhibitionListCard';
+import { ExhibitionWithoutMuseum, getExhibitionByMuseumAPI } from '@/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SAMPLE_DATES = ['Sun 13', 'Mon 14', 'Tue 15', 'Wed 16', 'Thu 17'];
-const SAMPLE_EXHIBITIONS = [
-  { id: '1', title: 'Antes assim que infelizmente', period: '11 Apr – 31 May', image: require('../../assets/images/imgs/exhibition.png') },
-  { id: '2', title: 'O amanhã e o ontem', period: '01 Jun – 20 Jul', image: require('../../assets/images/imgs/exhibition.png') },
-  { id: '3', title: 'Fragmentos de Cor', period: '05 Aug – 30 Sep', image: require('../../assets/images/imgs/exhibition.png') },
-];
 
 export default function ExhibitionScreen() {
+  const {axiosInstance} = useAuth();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string>(SAMPLE_DATES[0]);
+  const [exhibitions, setExhibitions] = useState<ExhibitionWithoutMuseum[]>([]);
+  const { museumId } = useLocalSearchParams<{
+    museumId: string;
+  }>();
+  const [exhibitionStartsWith, setExhibitionStartsWith] = useState<string>('');
+
+  useEffect(() => {
+    // TODO
+    const fetchExhibitions = async () => {
+      const response = await getExhibitionByMuseumAPI(axiosInstance, Number(museumId))
+      setExhibitions(response);
+    };
+    fetchExhibitions();
+  }, []);
+
+
+  useEffect(() => {
+    if (exhibitionStartsWith !== "") {
+      const fetchExhibitions = async () => {
+        const response = await getExhibitionByMuseumAPI(axiosInstance, Number(museumId), exhibitionStartsWith);
+        setExhibitions(response);
+      };
+      fetchExhibitions();
+    } else {
+      const fetchExhibitions = async () => {
+        const response = await getExhibitionByMuseumAPI(axiosInstance, Number(museumId));
+        setExhibitions(response);
+      };
+      fetchExhibitions();
+    }
+  }, [exhibitionStartsWith]);
 
   return (
     <LinearGradient colors={["#202020", "#252525"]} style={{ flex: 1 }}>
@@ -41,7 +70,7 @@ export default function ExhibitionScreen() {
             </Text>
             <View className="flex-row items-center">
               <View className="flex-1">
-                <SearchBar />
+                <SearchBar placeholder='Search by exhibition name' setValue={setExhibitionStartsWith}/>
               </View>
               <TouchableOpacity className="ml-3 p-3 rounded-lg opacity-90">
                 <MaterialCommunityIcons
@@ -86,12 +115,18 @@ export default function ExhibitionScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 32 }}
             >
-              {SAMPLE_EXHIBITIONS.map((ex) => (
-                <View key={ex.id} className="mb-6">
+              {exhibitions.map((ex) => (
+                <View key={ex.exhibitionId} className="mb-6">
                   <ExhibitionListCard
-                    name={ex.title}
-                    period={ex.period}
-                    image={ex.image}
+                    name={ex.name}
+                    period={`${new Date(ex.startDate).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })} - ${new Date(ex.endDate).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })}`}
+                    image={ex.photoUrl}
                   />
                 </View>
               ))}

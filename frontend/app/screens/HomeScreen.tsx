@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,50 +17,64 @@ import { useRouter } from "expo-router";
 import MuseumCard from "../components/MuseumCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ExhibitionCard from "../components/ExhibitionCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { getExhibitionsAPI, getMuseumsAPI } from "@/api";
+import type { Exhibition, Museum } from "@/api";
 
 const HomeScreen = () => {
   const router = useRouter();
+  const {axiosInstance, login} = useAuth();
 
-  const museums = [
-    {
-      id: 1,
-      name: "Museum Unknown",
-      location: "Rua do Jervásio",
-      image: `https://thumbs.dreamstime.com/b/claraboia-no-sal%C3%A3o-principal-do-hamb%C3%BArguer-kunsthalle-museum-hamburg-alemanha-de-agosto-173807511.jpg`,
-      description: "Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.",
-    },
-    {
-      id: 2,
-      name: "Museum Unknown",
-      location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/museum2.png"),
-      description: "Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.Founded in 1870, the Metropolitan Museum of Art is one of the world's largest and finest art museums. Its collection includes more than two million works of art spanning over 5,000 years of human creativity.",
-    },
-  ];
+  const [museums, setMuseums] = useState<Museum[]>([]);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [museumStartsWith, setMuseumStartsWith] = useState<string>("");
 
-  const exhibitions = [
-    {
-      id: 1,
-      name: "Exhibition Pelicano",
-      museum: "Museum Unknown",
-      location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
-    },
-    {
-      id: 2,
-      name: "Exhibition Pelicano",
-      museum: "Museum Unknown",
-      location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
-    },
-    {
-      id: 3,
-      name: "Exhibition Pelicano",
-      museum: "Museum Unknown",
-      location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
-    },
-  ];
+  useEffect(() => {
+      const fetchMuseums = async () => {
+        const response = await getMuseumsAPI(axiosInstance);
+        setMuseums(response);
+      };
+
+      const fetchExhibitions = async () => {
+        const response = await getExhibitionsAPI(axiosInstance);
+        setExhibitions(response);
+      };
+  
+      fetchMuseums();
+      fetchExhibitions();
+    }, []);
+
+    useEffect(() => {
+      if (museumStartsWith !== "") {
+        console.log("Museum starts with: ", museumStartsWith);
+        //TODO
+        const fetchMuseums = async () => {
+          const response = await getMuseumsAPI(axiosInstance, museumStartsWith);
+          setMuseums(response);
+        };
+  
+        const fetchExhibitions = async () => {
+          const response = await getExhibitionsAPI(axiosInstance, museumStartsWith);
+          setExhibitions(response);
+        };
+
+        fetchMuseums();
+        fetchExhibitions();
+      } else {
+        const fetchMuseums = async () => {
+          const response = await getMuseumsAPI(axiosInstance);
+          setMuseums(response);
+        };
+  
+        const fetchExhibitions = async () => {
+          const response = await getExhibitionsAPI(axiosInstance);
+          setExhibitions(response);
+        };
+  
+        fetchMuseums();
+        fetchExhibitions();
+      }
+    }, [museumStartsWith]);
 
   return (
     <LinearGradient colors={["#202020", "#252525"]} style={{ flex: 1 }}>
@@ -100,7 +114,7 @@ const HomeScreen = () => {
                 </View>
 
                 <View className="mt-[7%] w-full">
-                  <SearchBar />
+                  <SearchBar placeholder="Search by a specific museum" setValue={setMuseumStartsWith} />
                 </View>
 
                 <View className="mt-[7%] flex-row justify-between items-center">
@@ -111,18 +125,19 @@ const HomeScreen = () => {
 
                 <FlatList
                   data={museums}
-                  keyExtractor={(item) => item.id.toString()}
+                  keyExtractor={(item) => item.museumId.toString()}
                   renderItem={({ item, index }) => (
                     <View
                       className={`${
-                        index === museums.length - 1 ? "mr-8" : "mr-0"
+                      index === museums.length - 1 ? "mr-8" : "mr-0"
                       } && ${index === 0 ? "ml-2" : "ml-0"}`}
                     >
                       <MuseumCard
-                        name={item.name}
-                        location={item.location}
-                        image={item.image}
-                        description={item.description}
+                      museumId={item.museumId.toString()}
+                      name={item.name}
+                      location={item.location}
+                      image={item.photoUrl}
+                      description={item.description}
                       />
                     </View>
                   )}
@@ -140,18 +155,24 @@ const HomeScreen = () => {
 
                 <FlatList
                   data={exhibitions}
-                  keyExtractor={(item) => item.id.toString()}
+                  keyExtractor={(item) => item.exhibitionId.toString()}
                   renderItem={({ item, index }) => (
                     <View
                       className={`${
-                        index === exhibitions.length - 1 ? "mr-8" : "mr-0"
+                      index === exhibitions.length - 1 ? "mr-8" : "mr-0"
                       } && ${index === 0 ? "ml-4" : "ml-0"}`}
                     >
                       <ExhibitionCard
-                        name={item.name}
-                        museum={item.museum}
-                        location={item.location}
-                        image={item.image}
+                      name={item.name}
+                      museum={item.museumName}
+                      period={`${new Date(item.startDate).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })} - ${new Date(item.endDate).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })}`}
+                      image={item.photoUrl}
                       />
                     </View>
                   )}

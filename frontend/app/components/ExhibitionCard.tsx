@@ -7,14 +7,14 @@ import { ImageSourcePropType } from "react-native";
 type ExhibitionCardProps = {
   name: string;
   museum: string;
-  location: string;
+  period: string;
   image: ImageSourcePropType;
 };
 
 const ExhibitionCard = ({
   name,
   museum,
-  location,
+  period,
   image,
 }: ExhibitionCardProps) => {
   return (
@@ -29,14 +29,8 @@ const ExhibitionCard = ({
         <Text className="text-quaternary text-xs font-bold">{name}</Text>
         <Text className="text-quaternary text-[8px] font-normal">{museum}</Text>
         <View className="flex-row items-center mt-[8%]">
-          <Ionicons
-            name="location-sharp"
-            size={12}
-            color="#CFCFCF"
-            className="w-3 h-3 mr-1"
-          />
-          <Text className="text-quaternary text-[6px] font-light">
-            {location}
+          <Text className="text-quaternary text-xs font-light ml-2">
+            {period}
           </Text>
         </View>
 

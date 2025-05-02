@@ -13,7 +13,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function MuseumDetailScreen() {
     const router = useRouter();
-    const { name, image, description } = useLocalSearchParams<{
+    const { museumId, name, image, description } = useLocalSearchParams<{
+        museumId: string;
         name: string;
         image?: string;
         description: string;
@@ -62,7 +63,12 @@ export default function MuseumDetailScreen() {
                         </Text>
 
                         <TouchableOpacity
-                            onPress={() => router.push('./ExhibitionScreen')}
+                            onPress={() => router.push({
+                                pathname: './ExhibitionScreen',
+                                params: {
+                                    museumId: museumId,
+                                }
+                            })}
                             className="mt-12 h-10 w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
                             activeOpacity={0.8}
                         >

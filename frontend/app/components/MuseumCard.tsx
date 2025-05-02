@@ -6,13 +6,14 @@ import { ImageSourcePropType } from "react-native";
 import { useRouter } from "expo-router";
 
 type MuseumCardProps = {
+  museumId: string;
   name: string;
   location: string;
   image: ImageSourcePropType;
   description: string;
 };
 
-const MuseumCard = ({ name, location, image, description }: MuseumCardProps) => {
+const MuseumCard = ({ museumId, name, location, image, description }: MuseumCardProps) => {
   const router = useRouter();
   return (
     <TouchableOpacity
@@ -43,6 +44,7 @@ const MuseumCard = ({ name, location, image, description }: MuseumCardProps) => 
               router.push({
                 pathname: "../screens/MuseumDetailScreen", 
                 params: {
+                museumId,
                 name,
                 location,
                 image: typeof image === 'string' ? image : undefined,
