@@ -17,6 +17,17 @@ const MuseumCard = ({ museumId, name, location, image, description }: MuseumCard
   const router = useRouter();
   return (
     <TouchableOpacity
+      onPress={() => {
+        router.push({
+            pathname: "../screens/MuseumDetailScreen", 
+            params: {
+              museumId,
+              name,
+              location,
+              image: typeof image === 'string' ? image : undefined,
+              description,
+          }});
+      }}
       className="w-48 h-56 rounded-2xl overflow-hidden relative ml-6"
       activeOpacity={0.8}
     >
@@ -39,23 +50,9 @@ const MuseumCard = ({ museumId, name, location, image, description }: MuseumCard
               {location}
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              router.push({
-                pathname: "../screens/MuseumDetailScreen", 
-                params: {
-                museumId,
-                name,
-                location,
-                image: typeof image === 'string' ? image : undefined,
-                description,
-                }});
-            }}
-            className="absolute right-0 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-quaternary rounded-lg items-center justify-center"
-            activeOpacity={0.8}
-          >
+          <View className="absolute right-0 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-quaternary rounded-lg items-center justify-center">
             <Text className="text-xs font-bold text-primary">Visit</Text>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     </TouchableOpacity>

@@ -20,8 +20,21 @@ const ExhibitionListCard = ({
   image,
 }: ExhibitionListCardProps) => {
   const router = useRouter();
+
   return (
     <TouchableOpacity
+      onPress={() => {
+        const url = typeof image === "string" ? image : (image as any).uri;
+        router.push({
+          pathname: "../screens/ExhibitionDetailScreen",
+          params: {
+            image: url,
+            exhibitionId: exhibitionId,
+            name,
+            description,
+          },
+        });
+      }}
       className="w-64 h-56 bg-decenary rounded-2xl overflow-hidden ml-3"
       activeOpacity={0.8}
     >
@@ -33,33 +46,23 @@ const ExhibitionListCard = ({
         />
       </View>
 
-      <View className="flex-1 p-2 ml-1 flex flex-col">
-        <Text className="text-quaternary text-lg font-bold">
+      <View className="flex-1 p-2 ml-1">
+        <Text
+          className="text-quaternary text- font-bold"
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
           {name}
         </Text>
 
-        <View className="flex-row items-center justify-between mt-auto">
-          <Text className="text-quaternary text-xs font-light">
+        <View className="absolute bottom-1 left-3 right-2 flex-row items-center justify-between">
+          <Text className="text-quaternary text-xs font-light" numberOfLines={1}>
             {period}
           </Text>
 
-          <TouchableOpacity
-            onPress={() => {
-              const url = typeof image === 'string' ? image : (image as any).uri;
-              router.push({
-                pathname: "../screens/ExhibitionDetailScreen",
-                params: {
-                  image: url,
-                  exhibitionId: exhibitionId,
-                  name,
-                  description,
-              }});
-            }}
-            className="w-14 h-7 bg-quaternary rounded-2xl items-center justify-center"
-            activeOpacity={0.8}
-          >
+          <View className="w-14 h-7 bg-quaternary rounded-2xl items-center justify-center">
             <Text className="text-xs font-bold text-primary">Select</Text>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
