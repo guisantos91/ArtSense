@@ -6,6 +6,7 @@ import {
   Image,
   Button,
   ImageBackground,
+  LayoutChangeEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -19,6 +20,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
 import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface LayoutDimensions {
+  width: number;
+  height: number;
+  x: number; 
+  y: number; 
+}
 
 const PhotoScreen = () => {
   const {axiosInstance} = useAuth();
@@ -37,6 +45,7 @@ const PhotoScreen = () => {
   );
   const [sheetIndex, setSheetIndex] = useState(0);
   const [points, setPoints] = useState<ArtifactPointLabel[]>([]);
+  const [imageLayout, setImageLayout] = useState<LayoutDimensions | null>(null);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
@@ -78,6 +87,7 @@ const PhotoScreen = () => {
     if (ref.current) {
       setIsLoading(true);
       setPoints([]); 
+      setImageLayout(null);
       try {
         const photo = await ref.current.takePictureAsync({quality: 0.1});
         setPhotoData({
@@ -127,6 +137,16 @@ const PhotoScreen = () => {
   const cancelPhoto = () => {
     setPhotoData(null);
     setPoints([]);
+    setImageLayout(null);
+  };
+
+  const onImageLayout = (event: LayoutChangeEvent) => {
+    const { width, height, x, y } = event.nativeEvent.layout;
+    // Only update if layout actually changes to avoid potential loops
+    if (!imageLayout || imageLayout.width !== width || imageLayout.height !== height) {
+        console.log("ImageBackground Layout Measured:", { width, height, x, y });
+        setImageLayout({ width, height, x, y });
+    }
   };
 
   return (
@@ -137,17 +157,50 @@ const PhotoScreen = () => {
             source={{ uri: photoData.uri }}
             className="flex-1 justify-between relative"
             resizeMode="cover"
+            onLayout={onImageLayout}
           >
-            {points.map((point, index) => {
-              console.log("Point: ", point);
-              const scaledX = (point.x / 1000) * photoData.width;
-              const scaledY = (point.y / 1000) * photoData.height;
+            {imageLayout && photoData && points.map((point, index) => {
+              const photoWidth = photoData.width;
+              const photoHeight = photoData.height;
+              const containerWidth = imageLayout.width;
+              const containerHeight = imageLayout.height;
+
+              if (!photoWidth || !photoHeight || !containerWidth || !containerHeight) {
+                console.warn("Cannot calculate point position, dimensions missing.");
+                return null;
+              }
+
+              const photoAspectRatio = photoWidth / photoHeight;
+              const containerAspectRatio = containerWidth / containerHeight;
+
+              let scale = 1;
+              let offsetX = 0;
+              let offsetY = 0;
+
+              if (containerAspectRatio > photoAspectRatio) {
+                scale = containerWidth / photoWidth;
+                const scaledPhotoHeight = photoHeight * scale;
+                offsetY = (containerHeight - scaledPhotoHeight) / 2; 
+              } else {
+
+                scale = containerHeight / photoHeight;
+                const scaledPhotoWidth = photoWidth * scale;
+                offsetX = (containerWidth - scaledPhotoWidth) / 2; 
+              }
+
+              const finalX = (point.x / 1000) * photoWidth * scale + offsetX;
+              const finalY = (point.y / 1000) * photoHeight * scale + offsetY;
+
+              if (finalX < -1 || finalX > containerWidth + 1 || finalY < -1 || finalY > containerHeight + 1) {
+                console.warn(`Point ${point.artifactId} (${point.name}) is outside visible bounds: (${finalX.toFixed(1)}, ${finalY.toFixed(1)}) in container (${containerWidth}x${containerHeight})`);
+                return null; 
+             }
 
               return (
                 <TouchableOpacity
-                  key={index}
+                  key={point.artifactId}
                   className="absolute"
-                  style={{ left: scaledX, top: scaledY }}
+                  style={{ left: finalX, top: finalY }}
                   onPress={() => openBottomSheet(point)}
                 >
                   <View className="relative w-5 h-5 items-center justify-center">
