@@ -15,6 +15,7 @@ import { Entypo } from "@expo/vector-icons";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface ArtifactPoint {
   x: number;
@@ -161,9 +162,23 @@ const PhotoScreen = () => {
                 <ImageBackground
                   source={require("../../assets/images/imgs/exhibition.png")}
                   resizeMode="cover"
-                  className="w-full h-full pt-3 px-8"
-                  imageStyle={{ opacity: 0.6 }}
+                  className="w-full h-[75%] pt-3 px-8"
                 >
+                  <LinearGradient
+                    colors={[
+                      "rgba(28, 28, 30, 0)",
+                      "rgba(28, 28, 30, 0.8)",
+                      "#101010",
+                    ]}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  />
+
                   <View className="items-center justify-center">
                     <View
                       style={{
@@ -171,7 +186,6 @@ const PhotoScreen = () => {
                         height: 4,
                         borderRadius: 2,
                         backgroundColor: "white",
-                        opacity: 0.4,
                       }}
                     />
                   </View>
@@ -185,7 +199,7 @@ const PhotoScreen = () => {
                         }}
                         className="m-[10%]"
                       >
-                        <AntDesign name="arrowleft" size={32} color="#D9D8DE" />
+                        <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
                       </TouchableOpacity>
                     </View>
                   )}
