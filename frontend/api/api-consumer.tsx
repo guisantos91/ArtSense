@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { ArtifactPointLabel, LoginCredentials, SignupCredentials } from './dto/dto';
 import { ImageSourcePropType } from 'react-native';
 
@@ -59,6 +59,21 @@ const getExhibitionsAPI = async (
         {
             headers: {
             'Content-Type': 'application/json',
+            },
+        }
+    );
+    return response.data;
+}
+
+const getArtifactAPI = async (
+    axiosInstance: AxiosInstance,
+    artifactId: number
+) => {
+    const response = await axiosInstance.get<Artifact>(
+        `/artifacts/${artifactId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
             },
         }
     );
@@ -128,13 +143,34 @@ interface ExhibitionWithoutMuseum {
     photoUrl: ImageSourcePropType;
 }
 
+interface Author {
+    authorId: number;
+    name: string;
+    description: string;
+    photoUrl: ImageSourcePropType;
+}
+
+interface Artifact {
+    name: string;
+    year: number;
+    location: string;
+    description: string;
+    material: string;
+    photoUrl: ImageSourcePropType;
+    dimensions: string;
+    llmPhotoUrl: string;
+    llmMimeType: string;
+    author: Author;
+}
+
 export {
     logInAPI,
     signUpAPI,
     getMuseumsAPI,
     getExhibitionsAPI,
     getExhibitionByMuseumAPI,
-    locateArtifactsAPI
+    locateArtifactsAPI,
+    getArtifactAPI
 }
 
-export type { Museum, Exhibition, ExhibitionWithoutMuseum };
+export type { Museum, Exhibition, ExhibitionWithoutMuseum, Artifact };

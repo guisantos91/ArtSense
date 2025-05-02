@@ -7,6 +7,7 @@ import {
   Button,
   ImageBackground,
   LayoutChangeEvent,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -20,6 +21,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
 import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
+import * as ImageManipulator from "expo-image-manipulator";
 
 interface LayoutDimensions {
   width: number;
@@ -89,7 +91,26 @@ const PhotoScreen = () => {
       setPoints([]); 
       setImageLayout(null);
       try {
-        const photo = await ref.current.takePictureAsync({quality: 0.1});
+        const photo = await ref.current.takePictureAsync({ quality: 0.1 });
+
+        // Import the required library for EXIF manipulation
+
+        // Rotate the image based on EXIF orientation
+        // const manipulatedPhoto = await ImageManipulator.manipulateAsync(
+        //   photo.uri,
+        //   [{ rotate: 90 }] // rotation in degrees to the right
+        // );
+
+        // const finalPhoto = {
+        //   uri: manipulatedPhoto.uri,
+        //   width: manipulatedPhoto.width,
+        //   height: manipulatedPhoto.height,
+        // };
+
+        // photo.uri = finalPhoto.uri;
+        // photo.width = finalPhoto.width;
+        // photo.height = finalPhoto.height;
+
         setPhotoData({
           uri: photo.uri,
           width: photo.width,
@@ -116,6 +137,7 @@ const PhotoScreen = () => {
           console.log("Points detected by the API: ", backendPoints);
 
           setPoints(backendPoints); 
+          openBottomSheet(backendPoints[0]); // Open the bottom sheet for the first detected point
           setPhotoData({
             uri: photo.uri,
             width: photo.width,
@@ -188,8 +210,15 @@ const PhotoScreen = () => {
                 offsetX = (containerWidth - scaledPhotoWidth) / 2; 
               }
 
-              const finalX = (point.x / 1000) * photoWidth * scale + offsetX;
-              const finalY = (point.y / 1000) * photoHeight * scale + offsetY;
+              // get real width and height of the display mobile
+              const displayWidth = Dimensions.get("window").width;
+              const displayHeight = Dimensions.get("window").height;
+
+              console.log("Display dimensions: ", { displayWidth, displayHeight });
+              console.log("Image dimensions: ", { photoWidth, photoHeight });;
+
+              const finalX = (point.x / 1000) * displayWidth;
+              const finalY = (point.y / 1000) * displayHeight;
 
               if (finalX < -1 || finalX > containerWidth + 1 || finalY < -1 || finalY > containerHeight + 1) {
                 console.warn(`Point ${point.artifactId} (${point.name}) is outside visible bounds: (${finalX.toFixed(1)}, ${finalY.toFixed(1)}) in container (${containerWidth}x${containerHeight})`);
@@ -198,7 +227,7 @@ const PhotoScreen = () => {
 
               return (
                 <TouchableOpacity
-                  key={point.artifactId}
+                  key={index}
                   className="absolute"
                   style={{ left: finalX, top: finalY }}
                   onPress={() => openBottomSheet(point)}

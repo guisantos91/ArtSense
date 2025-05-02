@@ -10,11 +10,13 @@ export {
     getMuseumsAPI,
     getExhibitionsAPI,
     getExhibitionByMuseumAPI,
-    locateArtifactsAPI
+    locateArtifactsAPI,
+    getArtifactAPI
 } from './api-consumer';
 
 export type {
     Museum,
     Exhibition,
-    ExhibitionWithoutMuseum
+    ExhibitionWithoutMuseum,
+    Artifact
 } from './api-consumer';
