@@ -29,10 +29,12 @@ public class ExhibitionService {
         this.llmService = llmService;
     }
 
-    public List<ExhibitionCardView> getAllExhibitions() {
+    public List<ExhibitionCardWithMuseum> getAllExhibitions(String museumStartsWith) {
         List<Exhibition> exhibitions = exhibitionRepository.findAll();
         return exhibitions.stream()
-                .map(exhibition -> new ExhibitionCardView(
+                .filter(exhibition -> museumStartsWith == null || exhibition.getMuseum().getName().toLowerCase().startsWith(museumStartsWith.toLowerCase()))
+                .map(exhibition -> new ExhibitionCardWithMuseum(
+                        exhibition.getMuseum().getName(),
                         exhibition.getExhibitionId(),
                         exhibition.getName(),
                         exhibition.getStartDate(),
@@ -42,8 +44,17 @@ public class ExhibitionService {
                 .toList();
     }
 
-    public List<ExhibitionCardView> getExhibitionsByMuseumIdByCurrentDate(Long museumId, LocalDateTime currentDate) {
-        return exhibitionRepository.findByMuseum_MuseumIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateAsc(museumId, currentDate, currentDate);
+    public List<ExhibitionCardView> getExhibitionsByMuseumIdByCurrentDate(Long museumId, LocalDateTime currentDate, String exhibitionStartsWith) {
+        return exhibitionRepository.findByMuseum_MuseumIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateAsc(museumId, currentDate, currentDate).stream()
+                .filter(exhibition -> exhibitionStartsWith == null || exhibition.getName().toLowerCase().startsWith(exhibitionStartsWith.toLowerCase()))
+                .map(exhibition -> new ExhibitionCardView(
+                        exhibition.getExhibitionId(),
+                        exhibition.getName(),
+                        exhibition.getStartDate(),
+                        exhibition.getEndDate(),
+                        exhibition.getPhotoUrl()
+                ))
+                .toList();
     } 
 
     public List<ExhibitionCardWithMuseum> getExhibitionsByMuseumId(Long museumId) {

@@ -2,6 +2,7 @@ package artsense.backend.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -29,11 +30,8 @@ public class MuseumController {
     }
 
     @GetMapping("/museums")
-    public ResponseEntity<List<MuseumCardView>> getAllMuseums() {
-        List<MuseumCardView> museums = museumService.getAllMuseums();
-        if (museums.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity<List<MuseumCardView>> getAllMuseums(@RequestParam(value="museumStartsWith", required=false) String museumStartsWith) {
+        List<MuseumCardView> museums = museumService.getAllMuseums(museumStartsWith);
         return new ResponseEntity<>(museums, HttpStatus.OK);
     }
 
@@ -47,12 +45,9 @@ public class MuseumController {
     }
 
     @GetMapping("/museums/{museumId}/exhibitions")
-    public ResponseEntity<List<ExhibitionCardView>> getExhibitionsByMuseumIdByCurrentDate(@PathVariable(value="museumId") Long museumId) {
+    public ResponseEntity<List<ExhibitionCardView>> getExhibitionsByMuseumIdByCurrentDate(@PathVariable(value="museumId") Long museumId, @RequestParam(value="exhibitionStartsWith", required=false) String exhibitionStartsWith) {
         LocalDateTime currentDate = LocalDateTime.now();
-        List<ExhibitionCardView> exhibitions = exhibitionService.getExhibitionsByMuseumIdByCurrentDate(museumId, currentDate);
-        if (exhibitions.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        List<ExhibitionCardView> exhibitions = exhibitionService.getExhibitionsByMuseumIdByCurrentDate(museumId, currentDate, exhibitionStartsWith);
         return new ResponseEntity<>(exhibitions, HttpStatus.OK);
     }
 

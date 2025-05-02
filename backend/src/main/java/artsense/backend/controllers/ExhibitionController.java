@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 
 import artsense.backend.dto.ArtifactPointLabel;
 import artsense.backend.dto.ExhibitionCardView;
+import artsense.backend.dto.ExhibitionCardWithMuseum;
 import artsense.backend.dto.ExhibitionIngressView;
 import artsense.backend.dto.ExhibitionView;
 import artsense.backend.models.Exhibition;
@@ -32,11 +34,8 @@ public class ExhibitionController {
     }
 
     @GetMapping("/exhibitions")
-    public ResponseEntity<List<ExhibitionCardView>> getAllExhibitions() {
-        List<ExhibitionCardView> exhibitions = exhibitionService.getAllExhibitions();
-        if (exhibitions.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity<List<ExhibitionCardWithMuseum>> getAllExhibitions(@RequestParam(value="museumStartsWith", required=false) String museumStartsWith) {
+        List<ExhibitionCardWithMuseum> exhibitions = exhibitionService.getAllExhibitions(museumStartsWith);
         return new ResponseEntity<>(exhibitions, HttpStatus.OK);
     }
 
