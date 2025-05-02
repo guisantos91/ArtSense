@@ -11,13 +11,30 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUpScreen = () => {
   const router = useRouter();
+  const {signup} = useAuth();
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const handleSignUp = async () => {
+    try {
+      console.log("Signing up with", { name, email, password, confirmPassword });
+      await signup({
+        name,
+        email,
+        password,
+      });
+      router.replace("./LoginScreen");
+    } catch (error) {
+      console.error("Signup failed", error);
+    }
+
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -46,7 +63,7 @@ const SignUpScreen = () => {
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder="Name"
+                  placeholder="name"
                   placeholderTextColor={"#CFCFCF"}
                   className="bg-septenary rounded-xl px-5 py-3 text-quaternary font-inter w-[92%] self-center"
                 />
@@ -59,7 +76,7 @@ const SignUpScreen = () => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="example@email.com"
+                  placeholder="email"
                   placeholderTextColor={"#CFCFCF"}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -96,7 +113,7 @@ const SignUpScreen = () => {
               </View>
 
               <TouchableOpacity
-                onPress={() => router.push("./HomeScreen")}
+                onPress={handleSignUp}
                 className="mt-[12%] h-[42px] w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
                 activeOpacity={0.8}
               >

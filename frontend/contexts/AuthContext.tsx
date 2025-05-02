@@ -36,7 +36,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   // login method
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await logInAPI(axiosInstance, credentials);
+      await logInAPI(axiosInstance, credentials);
     } catch (error) {
       console.log('Login error:', error);
       throw error;
@@ -45,9 +45,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // signup method
   const signup = async (credentials: SignupCredentials) => {
-    const response = await signUpAPI(axiosInstance, credentials);
-    if (response) {
-      router.push('../app/screens/LoginScreen'); // navigate to login page
+    try {
+        await signUpAPI(axiosInstance, credentials);
+    } catch (error) {
+        console.log('Signup error:', error);
+        throw error;
     }
   };
 
