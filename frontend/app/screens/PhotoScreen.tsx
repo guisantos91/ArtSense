@@ -258,7 +258,7 @@ const PhotoScreen = () => {
               <View className="flex-row items-center justify-between px-[6%]">
                 <View className="items-start w-14">
                   <TouchableOpacity
-                    onPress={() => router.push("./MuseumScreen")}
+                    onPress={() => router.push("./LandingScreen")}
                     className="bg-white p-2 rounded-full"
                     activeOpacity={0.8}
                   >
