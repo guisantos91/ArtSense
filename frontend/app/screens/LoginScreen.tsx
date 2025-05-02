@@ -11,11 +11,23 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
 
 const LoginScreen = () => {
+  const {axiosInstance, login} = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+
+  const handleLogin = async () => {
+    try {
+      console.log("Logging in with", { email, password });
+      await login({ email, password });
+      router.replace("./HomeScreen");
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-primary items-center justify-center">
@@ -59,7 +71,7 @@ const LoginScreen = () => {
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="must be 6 characters or more"
+                  placeholder="your password"
                   placeholderTextColor={"#CFCFCF"}
                   secureTextEntry
                   className="bg-septenary rounded-xl px-5 py-3 text-quaternary font-inter w-[92%] self-center"
@@ -67,7 +79,7 @@ const LoginScreen = () => {
               </View>
 
               <TouchableOpacity
-                onPress={() => router.push("./HomeScreen")}
+                onPress={handleLogin}
                 className="mt-[12%] h-[42px] w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
                 activeOpacity={0.8}
               >
