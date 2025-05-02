@@ -1,5 +1,7 @@
 import { Text, View } from "react-native";
 import { useFonts } from "expo-font";
+import { StatusBar } from "react-native";
+import LandingScreen from "./screens/LandingScreen";
 
 export default function Index() {
   const [fontsLoaded] = useFonts({
@@ -15,14 +17,14 @@ export default function Index() {
     return null;
   }
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text className="font-cormorant">Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
+      <LandingScreen />
+    </>
   );
 }

@@ -14,6 +14,7 @@ module.exports = {
       octonary: "#252525",
       nonary: "#3A3A3A",
       decenary: "#454545",
+      undecenary: "#FFFFFF",
     },
     fontFamily: {
       cormorant: ["CormorantGaramond"],
