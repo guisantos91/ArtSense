@@ -3,6 +3,7 @@ package artsense.backend.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +21,8 @@ public class Exhibition {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long exhibitionId;
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String qrCode;
     private String photoUrl;
