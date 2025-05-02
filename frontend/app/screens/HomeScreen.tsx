@@ -44,21 +44,24 @@ const HomeScreen = () => {
       name: "Exhibition Pelicano",
       museum: "Museum Unknown",
       location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
+      description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`,
+      image: `https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960`,
     },
     {
       id: 2,
       name: "Exhibition Pelicano",
       museum: "Museum Unknown",
       location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
+      description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`,
+      image: `https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960`,
     },
     {
       id: 3,
       name: "Exhibition Pelicano",
       museum: "Museum Unknown",
       location: "Rua do Jervásio",
-      image: require("../../assets/images/imgs/exhibition.png"),
+      description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`,
+      image: `https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960`,
     },
   ];
 
@@ -151,7 +154,8 @@ const HomeScreen = () => {
                         name={item.name}
                         museum={item.museum}
                         location={item.location}
-                        image={item.image}
+                        description={item.description}
+                        image={typeof item.image === "string" ? { uri: item.image } : item.image}
                       />
                     </View>
                   )}

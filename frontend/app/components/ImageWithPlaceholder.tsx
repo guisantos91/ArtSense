@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   View,
@@ -6,55 +6,25 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import { router } from 'expo-router';
-import { AxiosInstance, AxiosResponse } from 'axios';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 interface ImageWithPlaceholderProps {
   image: ImageSourcePropType | string;
   resizeMode?: 'contain' | 'cover' | 'stretch' | 'repeat' | 'center';
-  className?: string;
+  className?: string; // e.g. "rounded-2xl"
 }
 
-const getPhoto = async (
-  photo_url: string,
-  setImageUrl: (url: string) => void
-) => {
-  const axiosInstance: AxiosInstance = axios.create();
-  console.log('Fetching photo with ID:', photo_url);
-  interface GetPhotoResponse {
-    data: Blob;
-  }
+const fetchImage = async (url: string): Promise<string> => {
+  // If it's already a public URL, just return it:
+  if (url.startsWith('http')) return url;
 
-  interface GetPhotoError {
-    response?: {
-      status?: number;
-    };
-  }
-
-  if (photo_url.startsWith("http")) {
-    setImageUrl(photo_url);
-    return Promise.resolve();
-  }
-
-  axiosInstance
-    .get<GetPhotoResponse>(photo_url, {
-      responseType: 'blob',
-    })
-    .then((response: AxiosResponse<GetPhotoResponse>) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Str = Buffer.from(reader.result as ArrayBuffer).toString(
-          'base64'
-        );
-        const dataUrl = `data:image/png;base64,${base64Str}`;
-        setImageUrl(dataUrl);
-      };
-      reader.readAsArrayBuffer(response.data as unknown as Blob);
-    })
-    .catch((error: GetPhotoError) => {
-      console.error('Error fetching photo:', error);
-      throw error;
-    });
+  // Otherwise fetch blob → base64
+  const instance: AxiosInstance = axios.create();
+  const resp = await instance.get<ArrayBuffer>(url, {
+    responseType: 'arraybuffer',
+  });
+  const b64 = Buffer.from(resp.data).toString('base64');
+  return `data:image/png;base64,${b64}`;
 };
 
 const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
@@ -62,67 +32,68 @@ const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
   resizeMode = 'cover',
   className = '',
 }) => {
-  const [remoteUri, setRemoteUri] = useState<string | null>(null);
+  const [uri, setUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-
+    let mounted = true;
     if (typeof image === 'string') {
       setLoading(true);
-      getPhoto(
-        image as string,
-        (data: string): void => {
-          if (!isMounted) return;
-          setRemoteUri(
-        data.startsWith('http') ? data : `data:image/png;base64,${data}`
-          );
-        }
-      )
-        .catch((err: { response?: { status?: number } }): void => {
+      fetchImage(image)
+        .then((u) => {
+          if (mounted) setUri(u);
+        })
+        .catch((err: any) => {
           if (err.response?.status === 401) {
-        router.replace('../screens/LoginScreen');
+            router.replace('../screens/LoginScreen');
           } else {
-        console.error('Error fetching photo:', err);
+            console.error(err);
           }
         })
-        .finally((): void => {
-          if (isMounted) setLoading(false);
+        .finally(() => {
+          if (mounted) setLoading(false);
         });
     }
-
     return () => {
-      isMounted = false;
+      mounted = false;
     };
   }, [image]);
 
+  // 1) Local asset: render immediately
   if (typeof image !== 'string') {
     return (
       <Image
         source={image}
-        className={className}
+        className={`w-full h-full ${className}`}
         resizeMode={resizeMode}
       />
     );
   }
 
+  // 2) Loading state: gray box + spinner, full size
   if (loading) {
     return (
-      <View className={`bg-gray-200 ${className}`}>
+      <View
+        className={`w-full h-full bg-gray-200 ${className} justify-center items-center`}
+      >
         <ActivityIndicator size="small" color="#999" />
       </View>
     );
   }
 
-  return remoteUri ? (
-    <Image
-      source={{ uri: remoteUri }}
-      className={className}
-      resizeMode={resizeMode}
-    />
-  ) : (
-    <View className={`bg-gray-200 ${className}`} />
-  );
+  // 3) Loaded URL: render
+  if (uri) {
+    return (
+      <Image
+        source={{ uri }}
+        className={`w-full h-full ${className}`}
+        resizeMode={resizeMode}
+      />
+    );
+  }
+
+  // 4) Fallback: gray box full size
+  return <View className={`w-full h-full bg-gray-200 ${className}`} />;
 };
 
 export default ImageWithPlaceholder;

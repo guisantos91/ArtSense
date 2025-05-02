@@ -23,15 +23,15 @@ export default function MuseumDetailScreen() {
         <LinearGradient colors={['#202020', '#252525']} style={{ flex: 1 }}>
             <SafeAreaView className="flex-1 bg-primary">
                 <View className="flex-1 w-[95%] self-center">
-                    <Image
-                        source={require('../../assets/images/imgs/logo.png')}
-                        className="mt-[2%] w-full h-[6%] rounded-full"
-                        resizeMode="contain"
-                    />
                     <ScrollView
-                        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+                        contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
                         keyboardShouldPersistTaps="handled"
                     >
+                        <Image
+                            source={require('../../assets/images/imgs/logo.png')}
+                            className="mt-[2%] w-full h-[6%] rounded-full"
+                            resizeMode="contain"
+                        />
                         <View className="flex-row items-center mt-[4%] px-[2%]">
                             <TouchableOpacity onPress={() => router.back()} className="p-[2%]">
                                 <Ionicons name="arrow-back" size={24} color="#FFF" />
