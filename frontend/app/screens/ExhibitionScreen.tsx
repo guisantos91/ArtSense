@@ -18,9 +18,9 @@ import dayjs from 'dayjs';
 
 const SAMPLE_DATES = ['Sun 13', 'Mon 14', 'Tue 15', 'Wed 16', 'Thu 17'];
 const SAMPLE_EXHIBITIONS = [
-  { id: '1', title: 'Antes assim que infelizmente', period: '11 Apr – 31 May', description: `Lorem Ipsum...`, image: 'https://www.vmcdn.ca/...jpeg;w=960' },
-  { id: '2', title: 'O amanhã e o ontem', period: '01 Jun – 20 Jul', description: `Lorem Ipsum...`, image: 'https://www.vmcdn.ca/...jpeg;w=960' },
-  { id: '3', title: 'Fragmentos de Cor', period: '05 Aug – 30 Sep', description: `Lorem Ipsum...`, image: 'https://www.vmcdn.ca/...jpeg;w=960' },
+  { id: '1', title: 'Antes assim que infelizmente', period: '11 Apr – 31 May', description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`, image: 'https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960' },
+  { id: '2', title: 'O amanhã e o ontem', period: '01 Jun – 20 Jul', description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`, image: 'https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960' },
+  { id: '3', title: 'Fragmentos de Cor', period: '05 Aug – 30 Sep', description: `Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer`, image: 'https://www.vmcdn.ca/f/files/mountainviewtoday/images/mvt-care-and-wear-install.jpeg;w=960' },
 ];
 
 export default function ExhibitionScreen() {
