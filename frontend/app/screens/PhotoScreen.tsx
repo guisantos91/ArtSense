@@ -42,7 +42,7 @@ const PhotoScreen = () => {
   const [sheetIndex, setSheetIndex] = useState(0);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%", "85%"], []);
+  const snapPoints = useMemo(() => ["30%", "93%"], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
@@ -128,7 +128,7 @@ const PhotoScreen = () => {
               );
             })}
 
-            <View className="items-center mt-8">
+            <View className="items-center">
               <Image
                 source={require("../../assets/images/imgs/logo_ArtSense.png")}
                 className="self-center"
@@ -158,7 +158,7 @@ const PhotoScreen = () => {
             <CameraView style={{ flex: 1 }} ref={ref} facing={facing} />
 
             <View className="absolute inset-0">
-              <View className="flex-row items-center justify-between mt-[4%] px-[6%]">
+              <View className="flex-row items-center justify-between px-[6%]">
                 <View className="items-start w-14">
                   <TouchableOpacity
                     onPress={() => router.push("./MuseumScreen")}

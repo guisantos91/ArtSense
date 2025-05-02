@@ -1,5 +1,13 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+  Animated,
+  Easing,
+} from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
@@ -26,6 +34,27 @@ const ArtifactBottomSheet = ({
   sheetIndex,
   setSheetIndex,
 }: Props) => {
+  const arrowAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(arrowAnimation, {
+          toValue: -10,
+          duration: 800,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.quad),
+        }),
+        Animated.timing(arrowAnimation, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.quad),
+        }),
+      ])
+    ).start();
+  }, []);
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -40,7 +69,7 @@ const ArtifactBottomSheet = ({
         <ImageBackground
           source={require("../../assets/images/imgs/exhibition.png")}
           resizeMode="cover"
-          className="w-full h-[75%] pt-3 px-8"
+          className="w-full h-[50%] pt-3 px-8"
         >
           <LinearGradient
             colors={["rgba(28, 28, 30, 0)", "rgba(28, 28, 30, 0.8)", "#101010"]}
@@ -65,17 +94,30 @@ const ArtifactBottomSheet = ({
           </View>
 
           {sheetIndex === 1 && (
-            <View className="absolute top-4 left-4 z-10">
-              <TouchableOpacity
-                onPress={() => {
-                  bottomSheetRef.current?.close();
-                  setSheetIndex(0);
-                }}
-                className="m-[10%]"
-              >
-                <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
-              </TouchableOpacity>
-            </View>
+            <>
+              <View className="absolute top-4 left-4 z-10">
+                <TouchableOpacity
+                  onPress={() => {
+                    bottomSheetRef.current?.close();
+                    setSheetIndex(0);
+                  }}
+                  className="m-[10%]"
+                >
+                  <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
+                </TouchableOpacity>
+              </View>
+              <View className="absolute top-4 left-4 z-10">
+                <TouchableOpacity
+                  onPress={() => {
+                    bottomSheetRef.current?.close();
+                    setSheetIndex(0);
+                  }}
+                  className="m-[10%]"
+                >
+                  <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
+                </TouchableOpacity>
+              </View>
+            </>
           )}
 
           {selectedPoint && sheetIndex === 0 && (
@@ -96,6 +138,70 @@ const ArtifactBottomSheet = ({
             </View>
           )}
         </ImageBackground>
+        {sheetIndex === 1 && (
+          <View className="absolute top-[22%] flex-1 px-8 w-full">
+            <Text className="text-white text-5xl text-[40px] font-ebgaramond leading-none">
+              Der Wanderer über dem Nebelmeer
+            </Text>
+            <Text className="text-white text-base font-inter mt-1">
+              1818, Germany
+            </Text>
+
+            <View className="flex-row justify-between">
+              <View className="space-y-4 w-[50%] mt-6">
+                <View>
+                  <Text className="text-white font-bold text-xl mt-4">
+                    Dimensions
+                  </Text>
+                  <Text className="text-white text-base">148 × 178 cm</Text>
+                </View>
+                <View>
+                  <Text className="text-white font-bold text-xl mt-4">
+                    Material
+                  </Text>
+                  <Text className="text-white text-base">Oil on Canvas</Text>
+                </View>
+                <View>
+                  <Text className="text-white font-bold text-xl mt-4">
+                    Year
+                  </Text>
+                  <Text className="text-white text-base">1818</Text>
+                </View>
+              </View>
+
+              <View className="w-[40%] items-start space-y-2">
+                <Image
+                  source={require("../../assets/images/imgs/exhibition.png")}
+                  className="w-full h-40 rounded-md mb-2 self-end"
+                />
+                <Text className="text-white font-ebgaramond font-semibold text-lg">
+                  Caspar David Friedrich
+                </Text>
+                <Text className="text-white text-xs leading-snug mt-4">
+                  Lorem Ipsum is simply dummy text of the printing and
+                  typesetting industry. Lorem Ipsum has been the industry's
+                  standard dummy text ever since the 1500s, when an unknown
+                  printer
+                </Text>
+              </View>
+            </View>
+            <View className="items-center flex-1 mt-4">
+              <Animated.View
+                style={{ transform: [{ translateY: arrowAnimation }] }}
+              >
+                <AntDesign name="arrowdown" size={24} color="white" />
+              </Animated.View>
+
+              <TouchableOpacity>
+                <View className="bg-senary rounded-2xl px-4 py-3 mt-4 self-center">
+                  <Text className="text-center text-primary">
+                    Ask what you want to know
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </BottomSheetView>
     </BottomSheet>
   );
