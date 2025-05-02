@@ -12,7 +12,6 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import ExhibitionQRCode from '../components/ExhibitionQRCode';
 
 export default function ExhibitionDetailScreen() {
   const router = useRouter();
@@ -66,18 +65,10 @@ export default function ExhibitionDetailScreen() {
             <View className="w-10" />
           </View>
 
-          <Text className="mt-8 text-quaternary font-inter">
-            Scan this QR code at the exhibit to unlock the experience:
-          </Text>
-
-          <ExhibitionQRCode exhibitionId={exhibitionId} />
-
-          <View className="absolute bottom-0 left-0 right-0 p-6"> 
-            {/*
+          <View className="absolute bottom-0 left-0 right-0 p-6">
             <Text className="text-5xl mb-4 font-ebgaramond text-quinary font-extrabold text-center">
-               {name || 'Exhibition'}
+              {name || 'Exhibition'}
             </Text>
-            */}
             <Text className="mt-4 mb-6 text-center font-inter text-quaternary font-light">
               {description || 'No description available'}
             </Text>
