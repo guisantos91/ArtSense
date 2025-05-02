@@ -52,7 +52,7 @@ const LandingScreen = () => {
           </View>
 
           <TouchableOpacity
-            onPress={() => router.push("./screens/LoginScreen")}
+            onPress={() => router.replace("./screens/LoginScreen")}
             className="mt-[8%] w-[65%] h-12 bg-senary rounded-[14px] items-center justify-center"
             activeOpacity={0.8}
           >
