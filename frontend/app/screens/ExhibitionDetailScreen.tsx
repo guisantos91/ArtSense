@@ -71,7 +71,7 @@ export default function ExhibitionDetailScreen() {
           </Text>
 
           <TouchableOpacity
-            onPress={handleVisitExhibition}
+            onPress={() => router.push('./QRCodeScanner')}
             className="mt-6 w-[62%] h-12 bg-senary rounded-[14px] items-center justify-center mb-8 self-center"
             activeOpacity={0.8}
           >
