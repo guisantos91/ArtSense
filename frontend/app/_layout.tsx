@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
-import { View } from "react-native";
-import "./global.css";
+import "../global.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function RootLayout() {
   return (
-    <View className="flex-1 bg-primary">
+    <AuthProvider>
       <Stack screenOptions={{ headerShown: false }} />
-    </View>
+    </AuthProvider>
   );
 }
