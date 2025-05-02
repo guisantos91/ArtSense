@@ -15,13 +15,13 @@ const LandingScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView
-        className="flex-1 w-full"
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
+        keyboardShouldPersistTaps="handled"
       >
         <View className="w-[95%] h-[95%] bg-primary items-center self-center">
           <Image
             source={require("../../assets/images/imgs/logo.png")}
-            className="mt-[10%] w-full h-[5%] rounded-full"
+            className="mt-[4%] w-full h-[5%] rounded-full"
             resizeMode="contain"
           />
           <View className="mt-[7%] w-[98%] min-h-[540px] bg-octonary rounded-[72px] relative overflow-hidden">
