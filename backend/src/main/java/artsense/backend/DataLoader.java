@@ -93,16 +93,18 @@ public class DataLoader implements CommandLineRunner {
             "Mona Lisa", 1503, "Louvre Museum",
             "This half-length portrait by Leonardo da Vinci is arguably the most famous painting in the world. Considered an archetypal masterpiece of the Italian Renaissance, it's renowned for the sitter's enigmatic expression, the subtle modeling of forms (sfumato), and the atmospheric illusionism of the landscape background. Its fame is unparalleled, making it a global icon.",
             "Oil on poplar panel",
-            "https://en.wikipedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
-            "77 cm × 53 cm", daVinci, "artifact_monalisa"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/500px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+            "77 cm x 53 cm", daVinci, "artifact_monalisa",
+            "image/jpg"
         );
 
         Artifact starryNight = findOrCreateArtifact( // Note: Actual location is MoMA, using Orsay for demo
             "The Starry Night", 1889, "Musée d'Orsay",
             "Painted during his stay at the asylum in Saint-Rémy-de-Provence, this oil-on-canvas by Vincent van Gogh depicts the view from his east-facing window just before sunrise, with the addition of an idealized village. It is celebrated for its intense emotional expression, swirling brushstrokes, and symbolic representation of the night sky, becoming one of the most recognized paintings in Western art.",
             "Oil on canvas",
-            "https://www.researchgate.net/publication/2604197/figure/fig7/AS:668765079498761@1536457428251/Starry-Night-Vincent-van-Gogh-1889-1-Low-level-visual-features-blue-dark-yellow.ppm",
-            "73.7 cm × 92.1 cm", vanGogh, "artifact_starrynight"
+            "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jC8qrBAxwffzUVacVkrffgAAAA%26pid%3DApi&f=1&ipt=f2d975145a10ee897f42f30447c22c01ab5dee5152b4c35201712a465a68322e",
+            "73.7 cm x 92.1 cm", vanGogh, "artifact_starrynight",
+            "image/jpg"
         );
 
          Artifact selfPortraitVanGogh = findOrCreateArtifact( // Note: Actual location is Courtauld, using Orsay for demo
@@ -110,7 +112,8 @@ public class DataLoader implements CommandLineRunner {
             "One of several self-portraits Van Gogh painted after mutilating his left ear during a psychotic episode. This poignant work shows the artist in his studio, wearing a blue cap and green overcoat, with a bandaged ear. It offers a raw glimpse into his mental state and resilience during a turbulent period of his life.",
             "Oil on canvas",
             "https://ka-perseus-images.s3.amazonaws.com/653f09fedc305ad96ff0f7272df19fa7624f3c7e.jpg",
-            "60 cm x 49 cm", vanGogh, "artifact_vangogh_self"
+            "60 cm x 49 cm", vanGogh, "artifact_vangogh_self",
+            "image/jpg"
         );
 
         Artifact waterLilies = findOrCreateArtifact(
@@ -118,7 +121,8 @@ public class DataLoader implements CommandLineRunner {
             "This painting is part of Claude Monet's extensive series depicting his beloved flower garden at his home in Giverny. Created later in his life, these works, often monumental in scale, are immersive studies of light, reflection, and atmosphere on the surface of his lily pond. They represent a culmination of his Impressionist exploration of nature and perception.",
             "Oil on canvas",
             "https://m.media-amazon.com/images/I/71k6C5JV9vL._AC_UF894,1000_QL80_.jpg",
-            "Varies (often large scale)", monet, "artifact_waterlilies"
+            "Varies (often large scale)", monet, "artifact_waterlilies",
+            "image/jpg"
         );
 
         Artifact wingedVictory = findOrCreateArtifact(
@@ -126,9 +130,9 @@ public class DataLoader implements CommandLineRunner {
             "Also known as the Nike of Samothrace, this 2nd-century BC marble sculpture depicts the Greek goddess of victory, Nike. Despite being significantly damaged (most notably missing her head and arms), it is celebrated as one of the greatest surviving masterpieces of Hellenistic sculpture. Its dynamic pose, masterful rendering of flowing drapery, and dramatic sense of movement are highly admired.",
             "Parian marble",
             "https://www.worldhistory.org/img/r/p/500x600/5287.jpg?v=1652876104",
-            "244 cm (height)", null, "artifact_wingedvictory" // Author unknown/not applicable
+            "244 cm (height)", null, "artifact_wingedvictory", // Author unknown/not applicable
+            "image/jpg" // Placeholder for LLM ID
         );
-
 
         // --- Create Exhibitions ---
         // Louvre Exhibitions
@@ -204,13 +208,13 @@ public class DataLoader implements CommandLineRunner {
         });
     }
 
-    private Artifact findOrCreateArtifact(String name, int year, String museumLocation, String description, String medium, String photoUrl, String dimensions, Author author, String llmIdPrefix) {
-         return artifactRepository.findByName(name).orElseGet(() -> {
+    private Artifact findOrCreateArtifact(String name, int year, String museumLocation, String description, String medium, String photoUrl, String dimensions, Author author, String llmIdPrefix, String contentType) {
+        return artifactRepository.findByName(name).orElseGet(() -> {
             // Simulate LLM upload - replace "artifact_id_placeholder" with a real ID generation if needed
             String uniqueLlmId = llmIdPrefix + "_" + System.currentTimeMillis(); // Simple unique ID
             LLMUpload llmupload;
             try {
-                llmupload = this.llmService.uploadFile(uniqueLlmId, photoUrl, "image/jpeg"); // Use unique ID
+                llmupload = this.llmService.uploadFile(uniqueLlmId, photoUrl, contentType); // Use unique ID
             } catch (Exception e) {
                 System.err.println("Failed to upload LLM file for artifact: " + name + ": " + e.getMessage());
                 llmupload = new LLMUpload("", ""); // Fallback values
