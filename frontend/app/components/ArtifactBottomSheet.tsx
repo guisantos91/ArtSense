@@ -63,7 +63,10 @@ const ArtifactBottomSheet = ({
       ref={bottomSheetRef}
       index={-1}
       snapPoints={snapPoints}
-      onChange={(index) => requestAnimationFrame(() => setSheetIndex(index))}
+      onChange={(index) => {
+        const safeIndex = Math.min(Math.max(index, 0), 1);
+        requestAnimationFrame(() => setSheetIndex(safeIndex));
+      }}
       enablePanDownToClose={true}
       handleComponent={() => null}
       backgroundStyle={{ backgroundColor: "transparent", borderRadius: 0 }}
@@ -98,17 +101,6 @@ const ArtifactBottomSheet = ({
 
           {sheetIndex === 1 && (
             <>
-              <View className="absolute top-4 left-4 z-10">
-                <TouchableOpacity
-                  onPress={() => {
-                    bottomSheetRef.current?.close();
-                    setSheetIndex(0);
-                  }}
-                  className="m-[10%]"
-                >
-                  <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
-                </TouchableOpacity>
-              </View>
               <View className="absolute top-4 left-4 z-10">
                 <TouchableOpacity
                   onPress={() => {
