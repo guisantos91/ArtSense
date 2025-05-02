@@ -12,18 +12,13 @@ import {
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
+import { ArtifactPointLabel } from "@/api";
 
-interface ArtifactPoint {
-  x: number;
-  y: number;
-  artifactId: number;
-  artifactName: string;
-}
 
 interface Props {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
   snapPoints: string[];
-  selectedPoint: ArtifactPoint | null;
+  selectedPoint: ArtifactPointLabel | null;
   sheetIndex: number;
   setSheetIndex: (index: number) => void;
   askSheetRef: React.RefObject<BottomSheet | null>;
@@ -195,7 +190,7 @@ const ArtifactBottomSheet = ({
           {selectedPoint && sheetIndex === 0 && (
             <View className="flex-1 items-center justify-start space-y-4">
               <Text className="text-white text-4xl font-ebgaramond text-center mt-[25%]">
-                {selectedPoint.artifactName}
+                {selectedPoint.name}
               </Text>
 
               <TouchableOpacity

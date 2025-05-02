@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from "react";
+import React, { useRef, useState, useCallback, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,13 +20,6 @@ import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
 import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface ArtifactPoint {
-  x: number;
-  y: number;
-  artifactId: number;
-  artifactName: string;
-}
-
 const PhotoScreen = () => {
   const {axiosInstance} = useAuth();
   const router = useRouter();
@@ -39,11 +32,11 @@ const PhotoScreen = () => {
     width: number;
     height: number;
   } | null>(null);
-  const [selectedPoint, setSelectedPoint] = useState<ArtifactPoint | null>(
+  const [selectedPoint, setSelectedPoint] = useState<ArtifactPointLabel | null>(
     null
   );
   const [sheetIndex, setSheetIndex] = useState(0);
-  const [points, setPoints] = useState<ArtifactPoint[]>([]);
+  const [points, setPoints] = useState<ArtifactPointLabel[]>([]);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
@@ -62,7 +55,7 @@ const PhotoScreen = () => {
       exhibitionId: string;
   }>();
 
-  const openBottomSheet = (point: ArtifactPoint) => {
+  const openBottomSheet = (point: ArtifactPointLabel) => {
     setSelectedPoint(point);
     bottomSheetRef.current?.snapToIndex(0);
     setSheetIndex(0);
@@ -86,7 +79,7 @@ const PhotoScreen = () => {
       setIsLoading(true);
       setPoints([]); 
       try {
-        const photo = await ref.current.takePictureAsync({quality: 0.5});
+        const photo = await ref.current.takePictureAsync({quality: 0.1});
         setPhotoData({
           uri: photo.uri,
           width: photo.width,
@@ -110,14 +103,9 @@ const PhotoScreen = () => {
 
 
         if (backendPoints && backendPoints.length > 0) {
-          const frontendPoints: ArtifactPoint[] = backendPoints.map(p => ({
-            x: p.x,
-            y: p.y,
-            artifactId: p.artifactId, 
-            artifactName: p.name, 
-          }));
+          console.log("Points detected by the API: ", backendPoints);
 
-          setPoints(frontendPoints); 
+          setPoints(backendPoints); 
           setPhotoData({
             uri: photo.uri,
             width: photo.width,
@@ -128,7 +116,6 @@ const PhotoScreen = () => {
            setPhotoData(null);
         }
 
-        setPoints(points);
       } catch (error) {
         console.error("Error taking a picture: ", error);
       } finally {
@@ -152,6 +139,7 @@ const PhotoScreen = () => {
             resizeMode="cover"
           >
             {points.map((point, index) => {
+              console.log("Point: ", point);
               const scaledX = (point.x / 1000) * photoData.width;
               const scaledY = (point.y / 1000) * photoData.height;
 
