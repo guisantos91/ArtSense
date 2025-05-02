@@ -25,6 +25,7 @@ interface Props {
   selectedPoint: ArtifactPoint | null;
   sheetIndex: number;
   setSheetIndex: (index: number) => void;
+  askSheetRef: React.RefObject<BottomSheet | null>;
 }
 
 const ArtifactBottomSheet = ({
@@ -33,6 +34,7 @@ const ArtifactBottomSheet = ({
   selectedPoint,
   sheetIndex,
   setSheetIndex,
+  askSheetRef,
 }: Props) => {
   const arrowAnimation = useRef(new Animated.Value(0)).current;
 
@@ -173,7 +175,11 @@ const ArtifactBottomSheet = ({
                     <AntDesign name="arrowdown" size={24} color="white" />
                   </Animated.View>
 
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      askSheetRef.current?.snapToIndex(0);
+                    }}
+                  >
                     <View className="bg-senary rounded-2xl px-4 py-3 mt-2 self-center">
                       <Text className="text-center text-primary">
                         Ask what you want to know

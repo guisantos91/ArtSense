@@ -44,6 +44,9 @@ const PhotoScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
 
+  const askSheetRef = useRef<BottomSheet>(null);
+  const askSnapPoints = useMemo(() => ["25%"], []);
+
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
   }, []);
@@ -145,13 +148,34 @@ const PhotoScreen = () => {
               </TouchableOpacity>
             </View>
 
+            {/* <ArtifactBottomSheet
+              bottomSheetRef={bottomSheetRef}
+              snapPoints={snapPoints}
+              selectedPoint={selectedPoint}
+              sheetIndex={sheetIndex}
+              setSheetIndex={setSheetIndex}
+            /> */}
             <ArtifactBottomSheet
               bottomSheetRef={bottomSheetRef}
               snapPoints={snapPoints}
               selectedPoint={selectedPoint}
               sheetIndex={sheetIndex}
               setSheetIndex={setSheetIndex}
+              askSheetRef={askSheetRef}
             />
+
+            <BottomSheet
+              ref={askSheetRef}
+              index={-1}
+              snapPoints={askSnapPoints}
+              enablePanDownToClose
+              handleComponent={() => null}
+              backgroundStyle={{ backgroundColor: "white", borderRadius: 20 }}
+            >
+              <BottomSheetView className="flex-1 items-center justify-center">
+                <Text className="text-black text-xl">Olá</Text>
+              </BottomSheetView>
+            </BottomSheet>
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
