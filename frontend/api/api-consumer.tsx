@@ -98,6 +98,7 @@ interface Exhibition {
     name: string;
     startDate: string;
     endDate: string;
+    description: string;
     photoUrl: ImageSourcePropType;
 }
 
@@ -106,6 +107,7 @@ interface ExhibitionWithoutMuseum {
     name: string;
     startDate: string;
     endDate: string;
+    description: string;
     photoUrl: ImageSourcePropType;
 }
 

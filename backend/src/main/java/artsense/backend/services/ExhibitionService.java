@@ -37,6 +37,7 @@ public class ExhibitionService {
                         exhibition.getMuseum().getName(),
                         exhibition.getExhibitionId(),
                         exhibition.getName(),
+                        exhibition.getDescription(),
                         exhibition.getStartDate(),
                         exhibition.getEndDate(),
                         exhibition.getPhotoUrl()
@@ -50,6 +51,7 @@ public class ExhibitionService {
                 .map(exhibition -> new ExhibitionCardView(
                         exhibition.getExhibitionId(),
                         exhibition.getName(),
+                        exhibition.getDescription(),
                         exhibition.getStartDate(),
                         exhibition.getEndDate(),
                         exhibition.getPhotoUrl()

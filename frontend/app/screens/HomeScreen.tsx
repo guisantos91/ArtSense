@@ -163,6 +163,7 @@ const HomeScreen = () => {
                       } && ${index === 0 ? "ml-4" : "ml-0"}`}
                     >
                       <ExhibitionCard
+                      exhibitionId={item.exhibitionId.toString()}
                       name={item.name}
                       museum={item.museumName}
                       period={`${new Date(item.startDate).toLocaleDateString("en-US", {
@@ -173,6 +174,7 @@ const HomeScreen = () => {
                         month: "short",
                       })}`}
                       image={item.photoUrl}
+                      description={item.description}
                       />
                     </View>
                   )}
