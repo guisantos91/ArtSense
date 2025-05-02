@@ -8,7 +8,7 @@
 
 ### Initialize the backend
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
 ### Run the expo app

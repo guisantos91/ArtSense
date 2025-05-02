@@ -12,18 +12,14 @@ import {
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
+import { Artifact, ArtifactPointLabel, getArtifactAPI } from "@/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface ArtifactPoint {
-  x: number;
-  y: number;
-  artifactId: number;
-  artifactName: string;
-}
 
 interface Props {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
   snapPoints: string[];
-  selectedPoint: ArtifactPoint | null;
+  selectedPoint: ArtifactPointLabel | null;
   sheetIndex: number;
   setSheetIndex: (index: number) => void;
   askSheetRef: React.RefObject<BottomSheet | null>;
@@ -38,6 +34,8 @@ const ArtifactBottomSheet = ({
   askSheetRef,
 }: Props) => {
   const arrowAnimation = useRef(new Animated.Value(0)).current;
+  const [artifact, setArtifact] = React.useState<Artifact>();
+  const { axiosInstance } = useAuth();
 
   useEffect(() => {
     Animated.loop(
@@ -58,6 +56,24 @@ const ArtifactBottomSheet = ({
     ).start();
   }, []);
 
+  // const 
+  useEffect(() => {
+    if (selectedPoint) {
+      const fetchArtifact = async () => {
+        const response = await getArtifactAPI(axiosInstance, selectedPoint.artifactId);
+        // console.log("artifact", response);
+        setArtifact(response);
+      } 
+      console.log("selectedPoint", selectedPoint);
+      fetchArtifact();
+    }
+  }, [selectedPoint]);
+
+  useEffect(() => {
+    // aa
+    // console.log("artifact", artifact);
+  }, [artifact]);
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -73,7 +89,7 @@ const ArtifactBottomSheet = ({
     >
       <BottomSheetView className="flex-1 overflow-hidden bg-primary rounded-t-[40]">
         <ImageBackground
-          source={require("../../assets/images/imgs/exhibition.png")}
+          source={artifact?.photoUrl && typeof artifact.photoUrl === "string" ? { uri: artifact.photoUrl } : undefined}
           resizeMode="cover"
           className="w-full h-[50%] pt-3 px-8"
         >
@@ -115,10 +131,10 @@ const ArtifactBottomSheet = ({
 
               <View className="absolute mt-[55%] flex-1 w-full self-center">
                 <Text className="text-white text-5xl text-[40px] font-ebgaramond leading-none">
-                  Der Wanderer über dem Nebelmeer
+                  {artifact?.name}
                 </Text>
                 <Text className="text-white text-base font-inter mt-1">
-                  1818, Germany
+                  {artifact?.year}, {artifact?.location}
                 </Text>
 
                 <View className="flex-row justify-between">
@@ -127,41 +143,38 @@ const ArtifactBottomSheet = ({
                       <Text className="text-white font-bold text-xl mt-4">
                         Dimensions
                       </Text>
-                      <Text className="text-white text-base">148 × 178 cm</Text>
+                      <Text className="text-white text-base">{artifact?.dimensions}</Text>
                     </View>
                     <View>
                       <Text className="text-white font-bold text-xl mt-4">
                         Material
                       </Text>
                       <Text className="text-white text-base">
-                        Oil on Canvas
+                        {artifact?.material}
                       </Text>
                     </View>
                     <View>
                       <Text className="text-white font-bold text-xl mt-4">
                         Year
                       </Text>
-                      <Text className="text-white text-base">1818</Text>
+                      <Text className="text-white text-base">{artifact?.year}</Text>
                     </View>
                   </View>
 
                   <View className="w-[40%] items-start space-y-2">
                     <Image
-                      source={require("../../assets/images/imgs/exhibition.png")}
+                      source={artifact?.author.photoUrl && typeof artifact.author.photoUrl === "string" ? { uri: artifact.author.photoUrl } : undefined}
                       className="w-full h-40 rounded-md mb-2 self-end"
                     />
                     <Text className="text-white font-ebgaramond font-semibold text-lg">
-                      Caspar David Friedrich
+                      {artifact?.author.name}
                     </Text>
-                    <Text className="text-white text-xs leading-snug mt-4">
-                      Lorem Ipsum is simply dummy text of the printing and
-                      typesetting industry. Lorem Ipsum has been the industry's
-                      standard dummy text ever since the 1500s, when an unknown
-                      printer
+                    <Text className="text-white text-xs leading-snug mt-4 h-24">
+                      {artifact?.author.description}
                     </Text>
                   </View>
                 </View>
-                <View className="items-center flex-1">
+                <View className="items-center flex-1 mt-10">
                   <Animated.View
                     style={{ transform: [{ translateY: arrowAnimation }] }}
                   >
@@ -187,7 +200,7 @@ const ArtifactBottomSheet = ({
           {selectedPoint && sheetIndex === 0 && (
             <View className="flex-1 items-center justify-start space-y-4">
               <Text className="text-white text-4xl font-ebgaramond text-center mt-[25%]">
-                {selectedPoint.artifactName}
+                {selectedPoint.name}
               </Text>
 
               <TouchableOpacity

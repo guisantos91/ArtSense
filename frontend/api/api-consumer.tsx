@@ -1,5 +1,5 @@
-import { AxiosInstance } from 'axios';
-import { LoginCredentials, SignupCredentials } from './dto/dto';
+import axios, { AxiosInstance } from 'axios';
+import { ArtifactPointLabel, LoginCredentials, SignupCredentials } from './dto/dto';
 import { ImageSourcePropType } from 'react-native';
 
 const logInAPI = async (
@@ -65,6 +65,21 @@ const getExhibitionsAPI = async (
     return response.data;
 }
 
+const getArtifactAPI = async (
+    axiosInstance: AxiosInstance,
+    artifactId: number
+) => {
+    const response = await axiosInstance.get<Artifact>(
+        `/artifacts/${artifactId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    );
+    return response.data;
+}
+
 const getExhibitionByMuseumAPI = async (
     axiosInstance: AxiosInstance,
     museumId: number,
@@ -81,6 +96,23 @@ const getExhibitionByMuseumAPI = async (
         }
     );
     return response.data;
+}
+
+const locateArtifactsAPI = async (
+    axiosInstance: AxiosInstance,
+    exhibitionId: number,
+    formData: FormData
+) => {
+    const response = await axiosInstance.post<ArtifactPointLabel[]>(
+        `/exhibitions/${exhibitionId}/locate-artifacts`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
+    return response;
 }
 
 
@@ -111,12 +143,34 @@ interface ExhibitionWithoutMuseum {
     photoUrl: ImageSourcePropType;
 }
 
+interface Author {
+    authorId: number;
+    name: string;
+    description: string;
+    photoUrl: ImageSourcePropType;
+}
+
+interface Artifact {
+    name: string;
+    year: number;
+    location: string;
+    description: string;
+    material: string;
+    photoUrl: ImageSourcePropType;
+    dimensions: string;
+    llmPhotoUrl: string;
+    llmMimeType: string;
+    author: Author;
+}
+
 export {
     logInAPI,
     signUpAPI,
     getMuseumsAPI,
     getExhibitionsAPI,
-    getExhibitionByMuseumAPI
+    getExhibitionByMuseumAPI,
+    locateArtifactsAPI,
+    getArtifactAPI
 }
 
-export type { Museum, Exhibition, ExhibitionWithoutMuseum };
+export type { Museum, Exhibition, ExhibitionWithoutMuseum, Artifact };

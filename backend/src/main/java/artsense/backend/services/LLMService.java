@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.xmlunit.builder.Input;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -157,8 +158,8 @@ public class LLMService {
         
         prompt += "\nTask:\n" +
                 "1. Detect which of the reference artifacts are present in the Image to analyze. (the inline picture)\n" +
-                "2. For each detected artifact, provide its center pixel coordinates [x, y] in the Image to analyze normalized to 0-1000.\n" +
-                "3. Return a JSON object in the following format (using quotes surrounding the keys):\n" +
+                "2. For each detected artifact, provide its center pixel coordinates [x, y] in the Image, normalized to 0-1000.\n" +
+                "3. Return a JSON object in the following format (using quotes surrounding the keys) and the coordinate pairs must be correct and normalized to 0-1000:\n" +
                 "{\n" +
                 "  detections: [\n" +
                 "    {id: artifact-id-1, coordinates: [x1, y1]},\n" +
