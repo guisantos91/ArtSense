@@ -18,6 +18,7 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
 import AskBottomSheet from "../components/AskBottomSheet";
+import Logo from "../components/Logo";
 
 interface ArtifactPoint {
   x: number;
@@ -132,11 +133,7 @@ const PhotoScreen = () => {
             })}
 
             <View className="items-center">
-              <Image
-                source={require("../../assets/images/imgs/logo_ArtSense.png")}
-                className="self-center"
-                style={{ width: 160, resizeMode: "contain" }}
-              />
+              <Logo />
             </View>
 
             <View className="flex-row items-start w-full pl-6 pb-10">
@@ -176,11 +173,7 @@ const PhotoScreen = () => {
                 </View>
 
                 <View className="flex-1 items-center self-center">
-                  <Image
-                    source={require("../../assets/images/imgs/logo_ArtSense.png")}
-                    className="self-center"
-                    style={{ width: 160, resizeMode: "contain" }}
-                  />
+                  <Logo />
                 </View>
 
                 <View className="w-14" />

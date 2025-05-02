@@ -17,6 +17,7 @@ import ExhibitionListCard from "../components/ExhibitionListCard";
 import { ExhibitionWithoutMuseum, getExhibitionByMuseumAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import dayjs from "dayjs";
+import Logo from "../components/Logo";
 
 const SAMPLE_DATES = ["Sun 13", "Mon 14", "Tue 15", "Wed 16", "Thu 17"];
 
