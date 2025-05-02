@@ -2,7 +2,6 @@ package artsense.backend.services;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import artsense.backend.dto.ExhibitionCardWithMuseum;
 import artsense.backend.dto.ExhibitionIngressView;
 import artsense.backend.dto.ExhibitionView;
 import artsense.backend.dto.LLMUpload;
-import artsense.backend.models.Artifact;
 import artsense.backend.models.Exhibition;
 import artsense.backend.repositories.ExhibitionRepository;
 

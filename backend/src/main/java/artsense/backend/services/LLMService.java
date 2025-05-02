@@ -2,26 +2,21 @@ package artsense.backend.services;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.mock.web.MockMultipartFile;
+import java.util.Map;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import artsense.backend.dto.ArtifactInfoTemp;
 import artsense.backend.dto.ArtifactPointLabel;
@@ -33,9 +28,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class LLMService {
@@ -60,7 +52,7 @@ public class LLMService {
         return System.currentTimeMillis() - startTime;
     }
 
-    private OkHttpClient client;
+    private final OkHttpClient client;
 
     public LLMService() {
         this.client = new OkHttpClient();
