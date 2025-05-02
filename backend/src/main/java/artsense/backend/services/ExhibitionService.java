@@ -89,21 +89,15 @@ public class ExhibitionService {
             return null;
         }
 
-        String responseBody = llmService.locateArtifacts(image, artifactInfoTemp);
+        List<ArtifactPointLabel> artifactPointLabels = llmService.locateArtifacts(image, artifactInfoTemp);
         
-        if (responseBody.isEmpty()) {
+        if (artifactPointLabels.isEmpty()) {
             return null;
         }
 
-        System.out.println("Response body: " + responseBody);
+        System.out.println("Response body: " + artifactPointLabels);
 
-        // TODO: implement
-        return List.of(new ArtifactPointLabel(
-            12.5,
-            7.0,
-            2L,
-            "Artifac 1"
-        ));
+        return artifactPointLabels;
     }
 
 }
