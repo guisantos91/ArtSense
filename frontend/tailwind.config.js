@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#101010",
+        primary: "#202020",
         secondary: "#303030",
         tertiary: "#707070",
         quaternary: "#CFCFCF",
@@ -15,6 +15,7 @@ module.exports = {
         octonary: "#252525",
         nonary: "#3A3A3A",
         decenary: "#454545",
+        undecenary: "#FFFFFF",
       },
       fontFamily: {
         cormorant: ["CormorantGaramond"],

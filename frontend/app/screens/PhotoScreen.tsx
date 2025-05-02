@@ -148,13 +148,6 @@ const PhotoScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {/* <ArtifactBottomSheet
-              bottomSheetRef={bottomSheetRef}
-              snapPoints={snapPoints}
-              selectedPoint={selectedPoint}
-              sheetIndex={sheetIndex}
-              setSheetIndex={setSheetIndex}
-            /> */}
             <ArtifactBottomSheet
               bottomSheetRef={bottomSheetRef}
               snapPoints={snapPoints}

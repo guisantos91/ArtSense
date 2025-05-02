@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useRef } from "react";
 import {
   View,
@@ -74,7 +75,7 @@ const ArtifactBottomSheet = ({
           className="w-full h-[50%] pt-3 px-8"
         >
           <LinearGradient
-            colors={["rgba(28, 28, 30, 0)", "rgba(28, 28, 30, 0.8)", "#101010"]}
+            colors={["rgba(28, 28, 30, 0)", "rgba(28, 28, 30, 0.8)", "#202020"]}
             style={{
               position: "absolute",
               top: 0,
