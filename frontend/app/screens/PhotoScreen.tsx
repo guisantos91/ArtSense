@@ -14,6 +14,7 @@ import {
   ImageBackground,
   LayoutChangeEvent,
   Dimensions,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -29,14 +30,9 @@ import { Artifact, ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
+import { AxiosError } from "axios";
 import Logo from "../components/Logo";
 
-interface LayoutDimensions {
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-}
 
 const PhotoScreen = () => {
   const { axiosInstance } = useAuth();
@@ -55,7 +51,6 @@ const PhotoScreen = () => {
   );
   const [sheetIndex, setSheetIndex] = useState(0);
   const [points, setPoints] = useState<ArtifactPointLabel[]>([]);
-  const [imageLayout, setImageLayout] = useState<LayoutDimensions | null>(null);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
@@ -107,28 +102,9 @@ const PhotoScreen = () => {
   const takePicture = async () => {
     if (ref.current) {
       setIsLoading(true);
-      setPoints([]);
-      setImageLayout(null);
+      setPoints([]); 
       try {
         const photo = await ref.current.takePictureAsync({ quality: 0.1 });
-
-        // Import the required library for EXIF manipulation
-
-        // Rotate the image based on EXIF orientation
-        // const manipulatedPhoto = await ImageManipulator.manipulateAsync(
-        //   photo.uri,
-        //   [{ rotate: 90 }] // rotation in degrees to the right
-        // );
-
-        // const finalPhoto = {
-        //   uri: manipulatedPhoto.uri,
-        //   width: manipulatedPhoto.width,
-        //   height: manipulatedPhoto.height,
-        // };
-
-        // photo.uri = finalPhoto.uri;
-        // photo.width = finalPhoto.width;
-        // photo.height = finalPhoto.height;
 
         setPhotoData({
           uri: photo.uri,
@@ -167,33 +143,31 @@ const PhotoScreen = () => {
           });
         } else {
           console.log("No artifacts detected by the API.");
+          Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
           setPhotoData(null);
         }
-      } catch (error) {
-        console.error("Error taking a picture: ", error);
+
+      } catch (error: any) {
+        console.log("Error taking a picture: ", error);
+        if (error.isAxiosError) {
+          const axiosError = error as AxiosError; // Type assertion
+          if (axiosError.response?.status === 404) {
+            console.log("API returned 404: No artifacts found.");
+            Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
+          }
+        } else {
+          // Handle non-Axios errors (e.g., camera issues, processing errors)
+          Alert.alert("Error", "An error occurred while processing the photo.");
+        }
       } finally {
         setIsLoading(false);
       }
-    }
-  };
+    };
+  }
 
   const cancelPhoto = () => {
     setPhotoData(null);
     setPoints([]);
-    setImageLayout(null);
-  };
-
-  const onImageLayout = (event: LayoutChangeEvent) => {
-    const { width, height, x, y } = event.nativeEvent.layout;
-    // Only update if layout actually changes to avoid potential loops
-    if (
-      !imageLayout ||
-      imageLayout.width !== width ||
-      imageLayout.height !== height
-    ) {
-      console.log("ImageBackground Layout Measured:", { width, height, x, y });
-      setImageLayout({ width, height, x, y });
-    }
   };
 
   return (
@@ -204,49 +178,13 @@ const PhotoScreen = () => {
             source={{ uri: photoData.uri }}
             className="flex-1 justify-between relative"
             resizeMode="cover"
-            onLayout={onImageLayout}
           >
-            {imageLayout &&
-              photoData &&
-              points.map((point, index) => {
-                const photoWidth = photoData.width;
-                const photoHeight = photoData.height;
-                const containerWidth = imageLayout.width;
-                const containerHeight = imageLayout.height;
+            {photoData && points.map((point, index) => {
+              const photoWidth = photoData.width;
+              const photoHeight = photoData.height;
 
-                if (
-                  !photoWidth ||
-                  !photoHeight ||
-                  !containerWidth ||
-                  !containerHeight
-                ) {
-                  console.warn(
-                    "Cannot calculate point position, dimensions missing."
-                  );
-                  return null;
-                }
-
-                const photoAspectRatio = photoWidth / photoHeight;
-                const containerAspectRatio = containerWidth / containerHeight;
-
-                let scale = 1;
-                let offsetX = 0;
-                let offsetY = 0;
-
-                if (containerAspectRatio > photoAspectRatio) {
-                  scale = containerWidth / photoWidth;
-                  const scaledPhotoHeight = photoHeight * scale;
-                  offsetY = (containerHeight - scaledPhotoHeight) / 2;
-                } else {
-                  scale = containerHeight / photoHeight;
-                  const scaledPhotoWidth = photoWidth * scale;
-                  offsetX = (containerWidth - scaledPhotoWidth) / 2;
-                }
-
-                // get real width and height of the display mobile
                 const displayWidth = Dimensions.get("window").width;
                 const displayHeight = Dimensions.get("window").height;
-
                 console.log("Display dimensions: ", {
                   displayWidth,
                   displayHeight,
@@ -256,50 +194,33 @@ const PhotoScreen = () => {
                 const finalX = (point.x / 1000) * displayWidth;
                 const finalY = (point.y / 1000) * displayHeight;
 
-                if (
-                  finalX < -1 ||
-                  finalX > containerWidth + 1 ||
-                  finalY < -1 ||
-                  finalY > containerHeight + 1
-                ) {
-                  console.warn(
-                    `Point ${point.artifactId} (${
-                      point.name
-                    }) is outside visible bounds: (${finalX.toFixed(
-                      1
-                    )}, ${finalY.toFixed(
-                      1
-                    )}) in container (${containerWidth}x${containerHeight})`
-                  );
-                  return null;
-                }
-
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    className="absolute"
-                    style={{ left: finalX, top: finalY }}
-                    onPress={() => openBottomSheet(point)}
-                  >
-                    <View className="relative w-5 h-5 items-center justify-center">
-                      <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
-                      <View className="w-5 h-5 bg-white rounded-full" />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-
-            <View className="items-center">
-              <Logo />
-            </View>
-
-            <View className="flex-row items-start w-full pl-6 pb-10">
+              return (
+                <TouchableOpacity
+                  key={index}
+                  className="absolute"
+                  style={{ left: finalX, top: finalY }}
+                  onPress={() => openBottomSheet(point)}
+                >
+                  <View className="relative w-5 h-5 items-center justify-center">
+                    <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
+                    <View className="w-5 h-5 bg-white rounded-full" />
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+            <View className="flex-row items-center justify-between px-[6%]">
               <TouchableOpacity
                 className="bg-senary p-3 rounded-full"
                 onPress={cancelPhoto}
               >
                 <AntDesign name="arrowleft" size={32} color="black" />
               </TouchableOpacity>
+
+              <View className="items-center">
+                <Logo />
+              </View>
+
+              <View className="w-14" />
             </View>
 
             <ArtifactBottomSheet

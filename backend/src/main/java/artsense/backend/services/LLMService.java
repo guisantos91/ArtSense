@@ -151,7 +151,7 @@ public class LLMService {
         String generateContentUrl = apiUrl + "/v1beta/models/" + apiModel + ":generateContent?key=" + apiKey;
         String generateRequestJson = "{ \"contents\": [{ \"parts\": [";
 
-        String prompt = "Reference Artifacts:\n";
+        String prompt = "Ignore everything that you analyzed before.\n Here is the new Reference Artifacts:\n";
     
         for (Map.Entry<Long, ArtifactInfoTemp> entry : artifactInfoTemp.entrySet()) {
             Long artifactId = entry.getKey();
@@ -204,9 +204,11 @@ public class LLMService {
                   "1. Your primary goal is to analyze the single 'Image to Analyze' provided via 'inline_data'.\n" +
                   "2. Use the 'Reference Artifacts' images (provided via 'file_data') ONLY as visual references to identify WHICH artifacts to look for within the 'Image to Analyze'.\n" +
                   "3. Detect which of the named 'Reference Artifacts' are present within the 'Image to Analyze'. Do NOT report an artifact if it is only visible in its own 'Reference Artifacts' image but not in the 'Image to Analyze'.\n" +
-                  "4. For each artifact detected *within the 'Image to Analyze'*, provide its center pixel coordinates [x, y] of the ones that you are >95% sure that the detect is correct. These coordinates MUST be relative to the 'Image to Analyze' and normalized to a 0-1000 scale for both x and y.\n" +
+                  "4. For each artifact that you are 100% sure that was detected *within the 'Image to Analyze'*, provide its center pixel coordinates [x, y]. These coordinates MUST be relative to the 'Image to Analyze' and normalized to a 0-1000 scale for both x and y.\n" +
+                  "5. If you are NOT SURE about the detection of an artifact, do NOT include it in the output.\n" +
                   // Reverted JSON example format (no quotes on keys)
-                  "5. Return ONLY a valid JSON object containing the detections. Use the following format and DONT FORGET to use double quotes surrounding the key 'detections':\n" +
+                  "6. Return ONLY a VALID JSON object containing the detections regardless of the outcome, DO NOT say anything more.\n" + 
+                  "7. Answer with the following format (DO NOT forget the double quotes in the key):\n" +
                   "```json\n" +
                   "{\n" +
                   "  detections: [\n" + // Reverted: no quotes
@@ -250,6 +252,7 @@ public class LLMService {
             String result = jsonNode.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
             
             result = result.replace("```json", "").replace("```", "");
+            result = result.replaceAll("(?<!\")\\b(detections|id|coordinates)\\b\\s*:", "\"$1\":");
             
             System.out.println("To parse: " + result);
 
