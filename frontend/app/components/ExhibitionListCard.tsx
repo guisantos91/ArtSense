@@ -60,7 +60,7 @@ const ExhibitionListCard = ({
             {period}
           </Text>
 
-          <View className="w-14 h-7 bg-quaternary rounded-2xl items-center justify-center">
+          <View className="w-14 h-7 bottom-1 bg-quaternary rounded-2xl items-center justify-center">
             <Text className="text-xs font-bold text-primary">Select</Text>
           </View>
         </View>
