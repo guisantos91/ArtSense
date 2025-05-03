@@ -1,5 +1,10 @@
 package artsense.backend.services;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -9,13 +14,19 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.xmlunit.builder.Input;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -149,25 +160,69 @@ public class LLMService {
             System.out.println("Artifact ID: " + artifactId);
             System.out.println("Artifact Name: " + artifactInfo.getName());
             
-            prompt += "- ID: " + artifactId + ", Image URI: " + artifactInfo.getLlmUpload().getLlmPhotoUrl() + ", Mime Type: " + artifactInfo.getLlmUpload().getLlmMimeType() + "\n";
-            generateRequestJson += "{ \"file_data\": { \"mime_type\": \"" + artifactInfo.getLlmUpload().getLlmMimeType() + "\", \"file_uri\": \"" + artifactInfo.getLlmUpload().getLlmPhotoUrl() + "\" } },";
+            prompt += "- ID: " + artifactId + ", Name: " + artifactInfo.getName() + ", Reference Image URI: " + artifactInfo.getLlmUpload().getLlmPhotoUrl() + "\n";  
+            generateRequestJson += "{ \"file_data\": { \"mime_type\": \"" + artifactInfo.getLlmUpload().getLlmMimeType() + "\", \"file_uri\": \"" + artifactInfo.getLlmUpload().getLlmPhotoUrl() + "\" } },";       
         }
 
+        // --- Image Orientation Correction ---
+        byte[] originalBytes = multipartFile.getBytes();
+        int orientation = readImageOrientation(originalBytes);
+        byte[] imageBytesToSend = originalBytes; // Start with original bytes
+
+        if (orientation > 1) {
+            try {
+                BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(originalBytes));
+                if (originalImage != null) {
+                    BufferedImage rotatedImage = rotateImage(originalImage, orientation);
+                    // Convert rotated image back to bytes
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    String formatName = getFormatName(multipartFile.getContentType());
+                    boolean written = ImageIO.write(rotatedImage, formatName, baos);
+                    if (written) {
+                         imageBytesToSend = baos.toByteArray(); // Use rotated bytes
+                         System.out.println("Image successfully rotated and converted back to bytes.");
+                    } else {
+                         System.err.println("Failed to write rotated image to byte array for format: " + formatName + ". Using original image.");
+                    }
+                } else {
+                     System.err.println("Could not read image bytes into BufferedImage. Using original image.");
+                }
+            } catch (IOException e) {
+                System.err.println("Error during image rotation processing: " + e.getMessage() + ". Using original image.");
+            } catch (Exception e) { // Catch unexpected errors during rotation/conversion
+                 System.err.println("Unexpected error during image rotation: " + e.getMessage() + ". Using original image.");
+            }
+        }
+        // --- End Orientation Correction ---
+
         String inlineMimeType = multipartFile.getContentType();
-        generateRequestJson += "{ \"inline_data\": { \"mime_type\": \"" + inlineMimeType + "\", \"data\": \"" + Base64.getEncoder().encodeToString(multipartFile.getBytes()) + "\" } },";
+        generateRequestJson += "{ \"inline_data\": { \"mime_type\": \"" + inlineMimeType + "\", \"data\": \"" + Base64.getEncoder().encodeToString(imageBytesToSend) + "\" } },";
         
-        prompt += "\nTask:\n" +
-                "1. Detect which of the reference artifacts are present in the Image to analyze. (the inline picture)\n" +
-                "2. For each detected artifact, provide its center pixel coordinates [x, y] in the Image, normalized to 0-1000.\n" +
-                "3. Return a JSON object in the following format (using quotes surrounding the keys) and the coordinate pairs must be correct and normalized to 0-1000:\n" +
-                "{\n" +
-                "  detections: [\n" +
-                "    {id: artifact-id-1, coordinates: [x1, y1]},\n" +
-                "    {id: artifact-id-2, coordinates: [x2, y2]},\n" +
-                "    ...\n" +
-                "  ]\n" +
-                "}\n" +
-                "4. If no reference artifacts are found, return {detections: []}.";
+        prompt += "\nImage to Analyze:\n" +
+                  "- Provided via 'inline_data'.\n" +
+                  "\nTask:\n" +
+                  "1. Your primary goal is to analyze the single 'Image to Analyze' provided via 'inline_data'.\n" +
+                  "2. Use the 'Reference Artifacts' images (provided via 'file_data') ONLY as visual references to identify WHICH artifacts to look for within the 'Image to Analyze'.\n" +
+                  "3. Detect which of the named 'Reference Artifacts' are present within the 'Image to Analyze'. Do NOT report an artifact if it is only visible in its own 'Reference Artifacts' image but not in the 'Image to Analyze'.\n" +
+                  "4. For each artifact detected *within the 'Image to Analyze'*, provide its center pixel coordinates [x, y] of the ones that you are >95% sure that the detect is correct. These coordinates MUST be relative to the 'Image to Analyze' and normalized to a 0-1000 scale for both x and y.\n" +
+                  // Reverted JSON example format (no quotes on keys)
+                  "5. Return ONLY a valid JSON object containing the detections. Use the following format and DONT FORGET to use double quotes surrounding the key 'detections':\n" +
+                  "```json\n" +
+                  "{\n" +
+                  "  detections: [\n" + // Reverted: no quotes
+                  "    {id: artifact-id-1, coordinates: [x1, y1]},\n" + // Reverted: no quotes
+                  "    {id: artifact-id-2, coordinates: [x2, y2]},\n" + // Reverted: no quotes
+                  "    ...\n" +
+                  "  ]\n" +
+                  "}\n" +
+                  "```\n" +
+                  // Reverted JSON example format for empty case
+                  "6. If none of the 'Reference Artifacts' are found within the 'Image to Analyze', return exactly:\n" +
+                  "```json\n" +
+                  "{\n" +
+                  "  detections: []\n" + // Reverted: no quotes
+                  "}\n" +
+                  "```";
 
         generateRequestJson += "{ \"text\": \"" + prompt + "\" }]}]}";
 
@@ -326,5 +381,100 @@ public class LLMService {
         return new LLMUpload(fileUri, mimeType);
     }
 
+    private int readImageOrientation(byte[] imageBytes) {
+        int orientation = 1; // Default: normal orientation
+        try (InputStream imageInputStream = new ByteArrayInputStream(imageBytes)) {
+            Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
+            Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            if (directory != null && directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+                orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+                System.out.println("Detected EXIF Orientation: " + orientation);
+            }
+        } catch (ImageProcessingException | IOException | NullPointerException e) { // Added NullPointerException
+             // Log the error but proceed with default orientation
+            System.err.println("Could not read EXIF metadata or image format issue: " + e.getMessage());
+        } catch (Exception e) { // Catch unexpected errors during metadata reading
+             System.err.println("Unexpected error reading EXIF metadata: " + e.getMessage());
+        }
+        return orientation;
+    }
+
+    private BufferedImage rotateImage(BufferedImage originalImage, int orientation) {
+        if (originalImage == null || orientation <= 1 || orientation > 8) {
+            return originalImage; 
+        }
+
+        AffineTransform tx = new AffineTransform();
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+        int newWidth = width;
+        int newHeight = height;
+
+        System.out.println("Applying rotation for orientation: " + orientation);
+
+        switch (orientation) {
+            case 2: // Flip horizontal
+                tx.scale(-1.0, 1.0);
+                tx.translate(-width, 0);
+                break;
+            case 3: // Rotate 180 degrees
+                tx.translate(width, height);
+                tx.rotate(Math.PI);
+                break;
+            case 4: // Flip vertical
+                tx.scale(1.0, -1.0);
+                tx.translate(0, -height);
+                break;
+            case 5: // Rotate 90 degrees CW and flip vertical
+                tx.translate(height, 0);
+                tx.rotate(Math.PI / 2);
+                tx.scale(1.0, -1.0);
+                newWidth = height; newHeight = width;
+                break;
+            case 6: // Rotate 90 degrees CW
+                tx.translate(height, 0);
+                tx.rotate(Math.PI / 2);
+                newWidth = height; newHeight = width;
+                break;
+            case 7: // Rotate 270 degrees CW and flip vertical
+                tx.translate(0, width);
+                tx.rotate(3 * Math.PI / 2);
+                tx.scale(1.0, -1.0);
+                newWidth = height; newHeight = width;
+                break;
+            case 8: // Rotate 270 degrees CW
+                tx.translate(0, width);
+                tx.rotate(3 * Math.PI / 2);
+                newWidth = height; newHeight = width;
+                break;
+            default:
+                return originalImage; // No rotation needed
+        }
+
+        int imageType = (originalImage.getTransparency() == BufferedImage.TRANSLUCENT) ?
+                        BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, imageType);
+        Graphics2D g2d = rotatedImage.createGraphics();
+        g2d.drawImage(originalImage, tx, null);
+        g2d.dispose();
+
+        return rotatedImage;
+    }
+
+    private String getFormatName(String contentType) {
+        if (contentType == null) return "jpeg"; // Default
+        String lowerCaseType = contentType.toLowerCase();
+        if (lowerCaseType.contains("jpeg") || lowerCaseType.contains("jpg")) {
+            return "jpeg";
+        } else if (lowerCaseType.contains("png")) {
+            return "png";
+        } else if (lowerCaseType.contains("gif")) {
+            return "gif";
+        } else if (lowerCaseType.contains("bmp")) {
+            return "bmp";
+        }
+        // Add more formats if needed
+        return "jpeg"; // Default fallback
+    }
 
 }
