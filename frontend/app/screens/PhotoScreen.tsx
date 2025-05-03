@@ -15,6 +15,7 @@ import {
   LayoutChangeEvent,
   Dimensions,
   Alert,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -32,7 +33,6 @@ import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
 import { AxiosError } from "axios";
 import Logo from "../components/Logo";
-
 
 const PhotoScreen = () => {
   const { axiosInstance } = useAuth();
@@ -102,7 +102,7 @@ const PhotoScreen = () => {
   const takePicture = async () => {
     if (ref.current) {
       setIsLoading(true);
-      setPoints([]); 
+      setPoints([]);
       try {
         const photo = await ref.current.takePictureAsync({ quality: 0.1 });
 
@@ -143,17 +143,22 @@ const PhotoScreen = () => {
           });
         } else {
           console.log("No artifacts detected by the API.");
-          Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
+          Alert.alert(
+            "No Artifacts Found",
+            "Could not detect any artifacts from this exhibition in the photo."
+          );
           setPhotoData(null);
         }
-
       } catch (error: any) {
         console.log("Error taking a picture: ", error);
         if (error.isAxiosError) {
           const axiosError = error as AxiosError; // Type assertion
           if (axiosError.response?.status === 404) {
             console.log("API returned 404: No artifacts found.");
-            Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
+            Alert.alert(
+              "No Artifacts Found",
+              "Could not detect any artifacts from this exhibition in the photo."
+            );
           }
         } else {
           // Handle non-Axios errors (e.g., camera issues, processing errors)
@@ -162,8 +167,8 @@ const PhotoScreen = () => {
       } finally {
         setIsLoading(false);
       }
-    };
-  }
+    }
+  };
 
   const cancelPhoto = () => {
     setPhotoData(null);
@@ -172,16 +177,18 @@ const PhotoScreen = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1 bg-primary">
+      <SafeAreaView className="flex-1 bg-black">
+        <StatusBar hidden />
         {photoData ? (
           <ImageBackground
             source={{ uri: photoData.uri }}
             className="flex-1 justify-between relative"
             resizeMode="cover"
           >
-            {photoData && points.map((point, index) => {
-              const photoWidth = photoData.width;
-              const photoHeight = photoData.height;
+            {photoData &&
+              points.map((point, index) => {
+                const photoWidth = photoData.width;
+                const photoHeight = photoData.height;
 
                 const displayWidth = Dimensions.get("window").width;
                 const displayHeight = Dimensions.get("window").height;
@@ -194,33 +201,38 @@ const PhotoScreen = () => {
                 const finalX = (point.x / 1000) * displayWidth;
                 const finalY = (point.y / 1000) * displayHeight;
 
-              return (
-                <TouchableOpacity
-                  key={index}
-                  className="absolute"
-                  style={{ left: finalX, top: finalY }}
-                  onPress={() => openBottomSheet(point)}
-                >
-                  <View className="relative w-5 h-5 items-center justify-center">
-                    <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
-                    <View className="w-5 h-5 bg-white rounded-full" />
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-            <View className="flex-row items-center justify-between px-[6%]">
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    className="absolute"
+                    style={{ left: finalX, top: finalY }}
+                    onPress={() => openBottomSheet(point)}
+                  >
+                    <View className="relative w-5 h-5 items-center justify-center">
+                      <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
+                      <View className="w-5 h-5 bg-white rounded-full" />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            {/* <View className="flex-row items-center justify-between px-[6%]"> */}
+            {/* <TouchableOpacity
+                className="bg-senary p-3 rounded-full"
+                onPress={cancelPhoto}
+              >
+                <AntDesign name="arrowleft" size={32} color="black" />
+              </TouchableOpacity> */}
+
+            <View className="items-center">
+              <Logo />
+            </View>
+            <View className="flex-row items-start w-full pl-6 pb-10">
               <TouchableOpacity
                 className="bg-senary p-3 rounded-full"
                 onPress={cancelPhoto}
               >
                 <AntDesign name="arrowleft" size={32} color="black" />
               </TouchableOpacity>
-
-              <View className="items-center">
-                <Logo />
-              </View>
-
-              <View className="w-14" />
             </View>
 
             <ArtifactBottomSheet
@@ -235,14 +247,13 @@ const PhotoScreen = () => {
               setToOpen={setToOpen}
             />
 
-            <AskBottomSheet 
-              askSheetRef={askSheetRef} 
-              artifact={artifact}               
+            <AskBottomSheet
+              askSheetRef={askSheetRef}
+              artifact={artifact}
               articactId={selectedPoint?.artifactId}
               toOpen={toOpen}
               setToOpen={setToOpen}
             />
-            
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
@@ -268,11 +279,17 @@ const PhotoScreen = () => {
               </View>
 
               <View className="flex-1 flex-col justify-end items-center mb-16 space-y-4">
-                <View className="flex-row items-center space-x-2 p-3 bg-senary rounded-xl mb-5">
-                  <Text className="text-black font-inter text-sm mr-4">
+                <View className="absolute inset-x-5 bottom-28 bg-white rounded-2xl flex-row items-center justify-center py-2 mx-8">
+                  <Entypo
+                    name="camera"
+                    className="pr-3 pb-1"
+                    size={24}
+                    color="black"
+                  />
+
+                  <Text className="text-black text-sm font-inter">
                     Point the camera to a section with artfacts
                   </Text>
-                  <Entypo name="camera" size={24} color="black" />
                 </View>
 
                 <TouchableOpacity
