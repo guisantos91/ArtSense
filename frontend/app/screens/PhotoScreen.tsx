@@ -14,6 +14,7 @@ import {
   ImageBackground,
   LayoutChangeEvent,
   Dimensions,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -61,6 +62,10 @@ const PhotoScreen = () => {
   const snapPoints = useMemo(() => ["30%", "93%"], []);
 
   const askSheetRef = useRef<BottomSheet>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
+  useEffect(() => {
+    setShowWelcomeModal(true);
+  }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
@@ -187,6 +192,27 @@ const PhotoScreen = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-primary">
+        {showWelcomeModal && (
+          <Modal visible transparent animationType="fade">
+            <View className="flex-1 bg-black bg-opacity-70 justify-center items-center px-6">
+              <View className="bg-white p-6 rounded-2xl items-center max-w-[90%]">
+                <Text className="text-lg font-bold mb-2 text-center">
+                  Welcome to ArtSense!
+                </Text>
+                <Text className="text-center mb-4">
+                  You're about to start an interactive experience. Use your
+                  camera to explore the unseen side of art.
+                </Text>
+                <TouchableOpacity
+                  className="bg-primary px-6 py-2 rounded-xl"
+                  onPress={() => setShowWelcomeModal(false)}
+                >
+                  <Text className="text-white font-semibold">Start</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        )}
         {photoData ? (
           <ImageBackground
             source={{ uri: photoData.uri }}
