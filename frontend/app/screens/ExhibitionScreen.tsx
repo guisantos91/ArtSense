@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -98,109 +99,116 @@ export default function ExhibitionScreen() {
       <SafeAreaView className="flex-1 bg-primary">
         <View className="flex-1 w-[95%] self-center">
           <Logo />
-          <View className="px-4 py-6">
-            <Text className="text-quinary font-cormorant text-5xl ml-2 mb-4">
-              Exhibitions
-            </Text>
-            <View className="flex-row items-center">
-              <View className="flex-1">
-                <SearchBar
-                  placeholder="Search by exhibition name"
-                  setValue={setExhibitionStartsWith}
-                />
-              </View>
-              <TouchableOpacity
-                className="ml-3 p-3 rounded-lg opacity-90"
-                onPress={showDatePicker}
-              >
-                <MaterialCommunityIcons
-                  name="calendar-month-outline"
-                  size={24}
-                  color="#FFF"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View className="flex-row flex-1 ml-6">
-            <View className="mr-6 items-center">
-              <TouchableOpacity
-                className="mb-4"
-                onPress={() => setDayOffset((prev) => prev - 5)}
-              >
-                <Ionicons name="chevron-up" size={20} color="#FFF" />
-              </TouchableOpacity>
-
-              {sampleDates.map((date) => (
-                <TouchableOpacity
-                  key={date}
-                  onPress={() => setSelectedDate(date)}
-                  className={`w-20 h-20 mb-2 rounded-2xl items-center justify-center ${
-                    selectedDate === date ? "bg-undecenary" : "bg-[#2A2A2A]"
-                  }`}
-                >
-                  <Text
-                    className={`text-md ${
-                      selectedDate === date
-                        ? "text-black font-bold"
-                        : "text-quaternary"
-                    }`}
-                  >
-                    {date.split(" ")[0]}
-                  </Text>
-                  <Text
-                    className={`text-2xl ${
-                      selectedDate === date
-                        ? "text-black font-bold"
-                        : "text-quaternary"
-                    }`}
-                  >
-                    {date.split(" ")[1]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-
-              <TouchableOpacity
-                className="mt-2"
-                onPress={() => setDayOffset((prev) => prev + 5)}
-              >
-                <Ionicons name="chevron-down" size={20} color="#FFF" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              className="flex-1"
-              contentContainerStyle={{ paddingBottom: 32 }}
-            >
-              {exhibitions.map((ex) => (
-                <View key={ex.exhibitionId} className="mb-6">
-                  <ExhibitionListCard
-                    name={ex.name}
-                    period={`${new Date(ex.startDate).toLocaleDateString(
-                      "en-US",
-                      {
-                        day: "2-digit",
-                        month: "short",
-                      }
-                    )} - ${new Date(ex.endDate).toLocaleDateString("en-US", {
-                      day: "2-digit",
-                      month: "short",
-                    })}`}
-                    image={ex.photoUrl}
-                    description={ex.description}
-                    exhibitionId={ex.exhibitionId.toString()}
+          <View className="mt-[4%] w-full flex-1 bg-octonary rounded-t-[72px] px-8 pb-10">
+            <View>
+              <Text className="mt-[15%] text-quinary font-cormorant text-5xl">
+                Exhibitions
+              </Text>
+              <View className="flex-row items-center mt-[5%]">
+                <View className="flex-1">
+                  <SearchBar
+                    placeholder="Search by exhibition name"
+                    setValue={setExhibitionStartsWith}
                   />
                 </View>
-              ))}
-            </ScrollView>
-          </View>
+                <TouchableOpacity
+                  className="ml-3 p-3 rounded-lg opacity-90"
+                  onPress={showDatePicker}
+                >
+                  <MaterialCommunityIcons
+                    name="calendar-month-outline"
+                    size={24}
+                    color="#FFF"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
+            <View className="flex-row flex-1">
+              <View className="items-center self-center">
+                <TouchableOpacity
+                  className="mb-4"
+                  onPress={() => setDayOffset((prev) => prev - 5)}
+                >
+                  <Ionicons name="chevron-up" size={20} color="#FFF" />
+                </TouchableOpacity>
+
+                {sampleDates.map((date) => (
+                  <TouchableOpacity
+                    key={date}
+                    onPress={() => setSelectedDate(date)}
+                    className={`w-20 h-20 mb-2 rounded-2xl items-center justify-center ${
+                      selectedDate === date ? "bg-undecenary" : "bg-[#2A2A2A]"
+                    }`}
+                  >
+                    <Text
+                      className={`text-md ${
+                        selectedDate === date
+                          ? "text-black font-bold"
+                          : "text-quaternary"
+                      }`}
+                    >
+                      {date.split(" ")[0]}
+                    </Text>
+                    <Text
+                      className={`text-2xl ${
+                        selectedDate === date
+                          ? "text-black font-bold"
+                          : "text-quaternary"
+                      }`}
+                    >
+                      {date.split(" ")[1]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+
+                <TouchableOpacity
+                  className="mt-2"
+                  onPress={() => setDayOffset((prev) => prev + 5)}
+                >
+                  <Ionicons name="chevron-down" size={20} color="#FFF" />
+                </TouchableOpacity>
+              </View>
+
+              <FlatList
+                data={exhibitions}
+                keyExtractor={(item) => item.exhibitionId.toString()}
+                renderItem={({ item }) => (
+                  <View className="mb-6">
+                    <ExhibitionListCard
+                      name={item.name}
+                      period={`${new Date(item.startDate).toLocaleDateString(
+                        "en-US",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                        }
+                      )} - ${new Date(item.endDate).toLocaleDateString(
+                        "en-US",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                        }
+                      )}`}
+                      image={item.photoUrl}
+                      description={item.description}
+                      exhibitionId={item.exhibitionId.toString()}
+                    />
+                  </View>
+                )}
+                contentContainerStyle={{ paddingBottom: 32 }}
+                showsVerticalScrollIndicator={false}
+                className="flex-1 self-center ml-4"
+              />
+            </View>
+
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+          </View>
         </View>
       </SafeAreaView>
     </LinearGradient>

@@ -74,10 +74,10 @@ export default function MuseumDetailScreen() {
                   },
                 })
               }
-              className="mt-12 h-10 w-[92%] self-center bg-senary rounded-[14px] items-center justify-center"
+              className="mt-12 py-3 w-[95%] self-center bg-senary rounded-xl items-center justify-center"
               activeOpacity={0.8}
             >
-              <Text className="text-septenary font-inter font-semibold">
+              <Text className="text-septenary font-inter font-semibold text-lg">
                 See Exhibitions
               </Text>
             </TouchableOpacity>
