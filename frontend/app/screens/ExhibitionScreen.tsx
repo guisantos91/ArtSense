@@ -16,6 +16,7 @@ import ExhibitionListCard from "../components/ExhibitionListCard";
 import { ExhibitionWithoutMuseum, getExhibitionByMuseumAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import dayjs from "dayjs";
+import Logo from "../components/Logo";
 
 export default function ExhibitionScreen() {
   const { axiosInstance } = useAuth();
@@ -96,11 +97,7 @@ export default function ExhibitionScreen() {
     <LinearGradient colors={["#202020", "#252525"]} style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-primary">
         <View className="flex-1 w-[95%] self-center">
-          <Image
-            source={require("../../assets/images/imgs/logo.png")}
-            className="mt-[2%] w-full h-[5%] rounded-full"
-            resizeMode="contain"
-          />
+          <Logo />
           <View className="px-4 py-6">
             <Text className="text-quaternary font-inter font-bold text-4xl ml-2 mb-4">
               Exhibitions

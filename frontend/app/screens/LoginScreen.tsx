@@ -14,11 +14,7 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "../components/Logo";
 
-<<<<<<< HEAD
-const LoginScreen = () => {
-=======
 export default function LoginScreen() {
->>>>>>> dev
   const { login } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
