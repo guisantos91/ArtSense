@@ -16,7 +16,7 @@ module.exports = {
         nonary: "#3A3A3A",
         decenary: "#454545",
         undecenary: "#FFFFFF",
-      },
+    },
       fontFamily: {
         cormorant: ["CormorantGaramond"],
         cormorantItalic: ["CormorantGaramond-Italic"],
@@ -24,6 +24,7 @@ module.exports = {
         ebgaramondItalic: ["EBGaramond-Italic"],
         inter: ["Inter"],
         interItalic: ["Inter-Italic"],
+        playfair: ["Playfair"],
       },
     },
     plugins: [],

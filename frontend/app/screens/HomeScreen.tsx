@@ -20,6 +20,7 @@ import ExhibitionCard from "../components/ExhibitionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { getExhibitionsAPI, getMuseumsAPI } from "@/api";
 import type { Exhibition, Museum } from "@/api";
+import Logo from "../components/Logo";
 
 const HomeScreen = () => {
   const router = useRouter();
@@ -47,7 +48,6 @@ const HomeScreen = () => {
   useEffect(() => {
     if (museumStartsWith !== "") {
       console.log("Museum starts with: ", museumStartsWith);
-      //TODO
       const fetchMuseums = async () => {
         const response = await getMuseumsAPI(axiosInstance, museumStartsWith);
         setMuseums(response);
@@ -89,22 +89,19 @@ const HomeScreen = () => {
             className="flex-1 w-full"
             contentContainerStyle={{ paddingBottom: 20 }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
             <View className="w-[95%] items-center self-center">
-              <Image
-                source={require("../../assets/images/imgs/logo.png")}
-                className="mt-[2%] w-full h-[5%] rounded-full"
-                resizeMode="contain"
-              />
+              <Logo />
 
               <View className="mt-[4%] w-full flex-1 bg-octonary rounded-t-[72px] px-8 pb-10">
                 <View className="flex-row items-center justify-between">
-                  <Text className="mt-[12%] w-[80%] text-quinary font-cormorant font-semibold text-5xl">
+                  <Text className="mt-[15%] w-[80%] text-quinary font-cormorant text-5xl">
                     What are you looking for?
                   </Text>
                   <View className="bg-senary rounded-full p-2.5 mt-[12%] mr-[4%]">
                     <TouchableOpacity
-                      onPress={() => router.push("./PhotoScreen")}
+                      onPress={() => router.push("./QRCodeScreen")}
                       activeOpacity={0.8}
                     >
                       <MaterialCommunityIcons

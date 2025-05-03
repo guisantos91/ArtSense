@@ -12,21 +12,20 @@ import {
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
+import { Artifact, ArtifactPointLabel, getArtifactAPI } from "@/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface ArtifactPoint {
-  x: number;
-  y: number;
-  artifactId: number;
-  artifactName: string;
-}
 
 interface Props {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
   snapPoints: string[];
-  selectedPoint: ArtifactPoint | null;
+  selectedPoint: ArtifactPointLabel | null;
   sheetIndex: number;
   setSheetIndex: (index: number) => void;
   askSheetRef: React.RefObject<BottomSheet | null>;
+  artifact?: Artifact;
+  setArtifact: (artifact: Artifact) => void;
+  setToOpen: (toOpen: boolean) => void;
 }
 
 const ArtifactBottomSheet = ({
@@ -36,8 +35,12 @@ const ArtifactBottomSheet = ({
   sheetIndex,
   setSheetIndex,
   askSheetRef,
+  artifact,
+  setArtifact,
+  setToOpen,
 }: Props) => {
   const arrowAnimation = useRef(new Animated.Value(0)).current;
+  const { axiosInstance } = useAuth();
 
   useEffect(() => {
     Animated.loop(
@@ -58,19 +61,36 @@ const ArtifactBottomSheet = ({
     ).start();
   }, []);
 
+  useEffect(() => {
+    if (selectedPoint) {
+      const fetchArtifact = async () => {
+        const response = await getArtifactAPI(axiosInstance, selectedPoint.artifactId);
+        setArtifact(response);
+      } 
+      console.log("selectedPoint", selectedPoint);
+      fetchArtifact();
+    }
+  }, [selectedPoint]);
+
+  useEffect(() => {
+  }, [artifact]);
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
       index={-1}
       snapPoints={snapPoints}
-      onChange={(index) => requestAnimationFrame(() => setSheetIndex(index))}
+      onChange={(index) => {
+        const safeIndex = Math.min(Math.max(index, 0), 1);
+        requestAnimationFrame(() => setSheetIndex(safeIndex));
+      }}
       enablePanDownToClose={true}
       handleComponent={() => null}
       backgroundStyle={{ backgroundColor: "transparent", borderRadius: 0 }}
     >
       <BottomSheetView className="flex-1 overflow-hidden bg-primary rounded-t-[40]">
         <ImageBackground
-          source={require("../../assets/images/imgs/exhibition.png")}
+          source={artifact?.photoUrl && typeof artifact.photoUrl === "string" ? { uri: artifact.photoUrl } : undefined}
           resizeMode="cover"
           className="w-full h-[50%] pt-3 px-8"
         >
@@ -109,24 +129,13 @@ const ArtifactBottomSheet = ({
                   <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
                 </TouchableOpacity>
               </View>
-              <View className="absolute top-4 left-4 z-10">
-                <TouchableOpacity
-                  onPress={() => {
-                    bottomSheetRef.current?.close();
-                    setSheetIndex(0);
-                  }}
-                  className="m-[10%]"
-                >
-                  <AntDesign name="arrowleft" size={34} color="#D9D8DE" />
-                </TouchableOpacity>
-              </View>
 
               <View className="absolute mt-[55%] flex-1 w-full self-center">
                 <Text className="text-white text-5xl text-[40px] font-ebgaramond leading-none">
-                  Der Wanderer über dem Nebelmeer
+                  {artifact?.name}
                 </Text>
                 <Text className="text-white text-base font-inter mt-1">
-                  1818, Germany
+                  {artifact?.year}, {artifact?.location}
                 </Text>
 
                 <View className="flex-row justify-between">
@@ -135,41 +144,38 @@ const ArtifactBottomSheet = ({
                       <Text className="text-white font-bold text-xl mt-4">
                         Dimensions
                       </Text>
-                      <Text className="text-white text-base">148 × 178 cm</Text>
+                      <Text className="text-white text-base">{artifact?.dimensions}</Text>
                     </View>
                     <View>
                       <Text className="text-white font-bold text-xl mt-4">
                         Material
                       </Text>
                       <Text className="text-white text-base">
-                        Oil on Canvas
+                        {artifact?.material}
                       </Text>
                     </View>
                     <View>
                       <Text className="text-white font-bold text-xl mt-4">
                         Year
                       </Text>
-                      <Text className="text-white text-base">1818</Text>
+                      <Text className="text-white text-base">{artifact?.year}</Text>
                     </View>
                   </View>
 
                   <View className="w-[40%] items-start space-y-2">
                     <Image
-                      source={require("../../assets/images/imgs/exhibition.png")}
+                      source={artifact?.author.photoUrl && typeof artifact.author.photoUrl === "string" ? { uri: artifact.author.photoUrl } : undefined}
                       className="w-full h-40 rounded-md mb-2 self-end"
                     />
                     <Text className="text-white font-ebgaramond font-semibold text-lg">
-                      Caspar David Friedrich
+                      {artifact?.author.name}
                     </Text>
-                    <Text className="text-white text-xs leading-snug mt-4">
-                      Lorem Ipsum is simply dummy text of the printing and
-                      typesetting industry. Lorem Ipsum has been the industry's
-                      standard dummy text ever since the 1500s, when an unknown
-                      printer
+                    <Text className="text-white text-sm leading-snug mt-4 h-[120px]">
+                      {artifact?.author.description}
                     </Text>
                   </View>
                 </View>
-                <View className="items-center flex-1">
+                <View className="items-center flex-1 mt-12">
                   <Animated.View
                     style={{ transform: [{ translateY: arrowAnimation }] }}
                   >
@@ -179,11 +185,12 @@ const ArtifactBottomSheet = ({
                   <TouchableOpacity
                     onPress={() => {
                       askSheetRef.current?.snapToIndex(0);
+                      setToOpen(true);
                     }}
                   >
                     <View className="bg-senary rounded-2xl px-4 py-3 mt-2 self-center">
-                      <Text className="text-center text-primary">
-                        Ask what you want to know
+                      <Text className="text-center text-primary px-8 text-xl font-inter">
+                        Ask me anything
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -195,7 +202,7 @@ const ArtifactBottomSheet = ({
           {selectedPoint && sheetIndex === 0 && (
             <View className="flex-1 items-center justify-start space-y-4">
               <Text className="text-white text-4xl font-ebgaramond text-center mt-[25%]">
-                {selectedPoint.artifactName}
+                {selectedPoint.name}
               </Text>
 
               <TouchableOpacity

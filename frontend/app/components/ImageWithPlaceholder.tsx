@@ -11,14 +11,12 @@ import axios, { AxiosInstance } from 'axios';
 interface ImageWithPlaceholderProps {
   image: ImageSourcePropType | string;
   resizeMode?: 'contain' | 'cover' | 'stretch' | 'repeat' | 'center';
-  className?: string; // e.g. "rounded-2xl"
+  className?: string;
 }
 
 const fetchImage = async (url: string): Promise<string> => {
-  // If it's already a public URL, just return it:
   if (url.startsWith('http')) return url;
 
-  // Otherwise fetch blob → base64
   const instance: AxiosInstance = axios.create();
   const resp = await instance.get<ArrayBuffer>(url, {
     responseType: 'arraybuffer',
@@ -59,7 +57,6 @@ const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
     };
   }, [image]);
 
-  // 1) Local asset: render immediately
   if (typeof image !== 'string') {
     return (
       <Image
@@ -70,7 +67,6 @@ const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
     );
   }
 
-  // 2) Loading state: gray box + spinner, full size
   if (loading) {
     return (
       <View
@@ -81,7 +77,6 @@ const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
     );
   }
 
-  // 3) Loaded URL: render
   if (uri) {
     return (
       <Image
@@ -92,7 +87,6 @@ const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
     );
   }
 
-  // 4) Fallback: gray box full size
   return <View className={`w-full h-full bg-gray-200 ${className}`} />;
 };
 

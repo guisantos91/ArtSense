@@ -9,7 +9,15 @@ interface SignupCredentials {
     password: string;
 }
 
+interface ArtifactPointLabel{
+    artifactId: number;
+    x: number;
+    y: number;
+    name: string;
+}
+
 export type { 
     LoginCredentials, 
-    SignupCredentials 
+    SignupCredentials,
+    ArtifactPointLabel 
 };
