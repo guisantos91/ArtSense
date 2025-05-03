@@ -115,6 +115,29 @@ const locateArtifactsAPI = async (
     return response;
 }
 
+const promptLLM = async (
+    axiosInstance: AxiosInstance,
+    prompt: string,
+    artifactId: number,
+    extraPhoto: FormData
+) => {
+    console.log("prompt: " + prompt);
+    const response = await axiosInstance.post<LLMResponse>(
+        `/artifacts/${artifactId}/prompt?prompt=${encodeURIComponent(prompt)}`,
+        extraPhoto,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
+    return response.data;
+}
+
+interface LLMResponse {
+    response: string;
+    htmlGoogleSearchSuggestion: string;
+}
 
 interface Museum {
     museumId: number;
@@ -170,7 +193,8 @@ export {
     getExhibitionsAPI,
     getExhibitionByMuseumAPI,
     locateArtifactsAPI,
-    getArtifactAPI
+    getArtifactAPI,
+    promptLLM
 }
 
 export type { Museum, Exhibition, ExhibitionWithoutMuseum, Artifact };
