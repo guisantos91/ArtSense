@@ -41,7 +41,7 @@ export default function LoginScreen() {
           <View className="w-[95%] h-[95%] bg-primary items-center self-center">
             <Logo />
 
-            <View className="flex-1 justify-center">
+            <View className="flex-1 justify-center w-full">
               <View className="w-full bg-octonary rounded-[72px] px-10 py-14">
                 <Text className="text-quinary font-ebgaramond text-6xl mb-8">
                   Login
