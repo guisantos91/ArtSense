@@ -68,7 +68,7 @@ export default function QRCodeScreen() {
       if ((resp.data.exhibitionId !== parseInt(id)) && id) {
         Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
       } else {
-        router.push(
+        router.replace(
           {
           pathname: './PhotoScreen',
           params: {
