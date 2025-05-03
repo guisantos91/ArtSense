@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import {
   View,
   Text,
@@ -9,22 +9,31 @@ import {
   Image,
   Animated,
   Easing,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Artifact, promptLLM } from "@/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Props {
   askSheetRef: React.RefObject<BottomSheet | null>;
+  artifact?: Artifact;
+  articactId?: number;
 }
 
-const AskBottomSheet = ({ askSheetRef }: Props) => {
+const AskBottomSheet = ({ askSheetRef, artifact, articactId }: Props) => {
   const snapPoints = ["93%"];
   const [prompt, setPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [response, setResponse] = useState<string | null>(null);
+  const [response, setResponse] = useState<string | null>("aaaaa");
   const [tempPrompt, setTempPrompt] = useState<string>("");
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  const { axiosInstance } = useAuth();
   const arrowAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -50,37 +59,46 @@ const AskBottomSheet = ({ askSheetRef }: Props) => {
     }
   }, [prompt]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!tempPrompt.trim()) return;
+    if (!articactId) return;
     setPrompt(tempPrompt); // só agora atualiza o título com o input
     setIsLoading(true);
     setResponse(null);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setResponse(
-        "The fact that the walker has his back turned creates an identification between the observer and him. It's as if we were invited to take his place and contemplate the landscape with him, increasing the feeling of immersion and reflection. The mist symbolises the unknown, the uncertain, the invisible future or even spirituality. It hides what lies beyond, suggesting that not everything can be understood or seen clearly."
-      );
-    }, 2000);
+    const formData = new FormData();
+    formData.append('extraPhoto', '');
+
+    const response = await promptLLM(axiosInstance, tempPrompt, articactId, formData);
+    
+    setIsLoading(false);
+    setResponse(
+      response.response
+    );
+    
+    setTempPrompt("");
   };
 
   return (
     <BottomSheet
       ref={askSheetRef}
       index={-1}
+      keyboardBlurBehavior="restore"
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       handleComponent={() => null}
       backgroundStyle={{ backgroundColor: "transparent", borderRadius: 0 }}
     >
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <BottomSheetView className="flex-1 overflow-hidden bg-primary rounded-t-[40]">
+      {/* <ScrollView automaticallyAdjustKeyboardInsets={true}> */}
         <ImageBackground
-          source={require("../../assets/images/imgs/exhibition.png")}
+          source={artifact?.photoUrl && typeof artifact.photoUrl === "string" ? { uri: artifact.photoUrl } : undefined}
           resizeMode="cover"
-          className="w-full h-[30%] pt-3 px-8"
+          className="w-full h-[50%] pt-3 px-8"
         >
           <LinearGradient
-            colors={["rgba(28, 28, 30, 0)", "rgba(28, 28, 30, 0.8)", "#202020"]}
+            colors={["rgba(28, 28, 30, 0)", "rgba(28, 28, 30, 0.95)", "#202020"]}
             style={{
               position: "absolute",
               top: 0,
@@ -102,9 +120,9 @@ const AskBottomSheet = ({ askSheetRef }: Props) => {
           </View>
         </ImageBackground>
 
-        <View className="flex-1 px-8 pb-32 pt-4">
+        <View className="flex-1 px-8 pt-4">
           {isLoading && (
-            <View className="flex-row items-center bg-[#202020] mt-4 rounded-xl">
+            <View className="flex-row items-center -mt-36 rounded-xl">
               <ActivityIndicator size="small" color="#fff" />
               <Text className="text-white text-base font-inter font-semibold ml-4">
                 Analysing....
@@ -113,18 +131,13 @@ const AskBottomSheet = ({ askSheetRef }: Props) => {
           )}
 
           {!isLoading && response && (
-            <View className="bg-[#202020] rounded-2xl mt-4">
-              <View className="flex-row justify-between items-center mb-3">
-                <Text className="text-white text-lg font-semibold font-inter w-[65%]">
+            <View className=" rounded-2xl -mt-36">
+              <View className="flex-row justify-between mb-3">
+                <Text className="text-white text-3xl font-semibold font-inter">
                   {prompt}
                 </Text>
-                <Image
-                  source={require("../../assets/images/imgs/exhibition.png")}
-                  className="w-28 h-28 rounded-lg"
-                  resizeMode="cover"
-                />
               </View>
-              <Text className="text-white text-sm leading-5 font-inter">
+              <Text className="text-white text-lg leading-5 mt-5">
                 {response}
               </Text>
               <View className="flex-row mt-4 space-x-2">
@@ -153,12 +166,13 @@ const AskBottomSheet = ({ askSheetRef }: Props) => {
 
         <View className="absolute bottom-5 left-0 right-0 px-8 flex-row items-end justify-between">
           <View className="flex-1 bg-[#202020] rounded-xl mr-3">
-            <TextInput
+            <BottomSheetTextInput
               value={tempPrompt}
               onChangeText={setTempPrompt}
               placeholder="Ask a question..."
               placeholderTextColor="#CFCFCF"
               autoCapitalize="none"
+              multiline
               className="bg-tertiary rounded-xl px-4 py-3 text-quaternary font-inter w-[92%] self-center"
               style={{ textAlignVertical: "center" }}
             />
@@ -177,7 +191,9 @@ const AskBottomSheet = ({ askSheetRef }: Props) => {
             <Ionicons name="paper-plane" size={24} color="#D9D8DE" />
           </TouchableOpacity>
         </View>
+      {/* </ScrollView> */}
       </BottomSheetView>
+      </TouchableWithoutFeedback>
     </BottomSheet>
   );
 };

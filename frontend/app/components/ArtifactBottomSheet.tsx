@@ -23,6 +23,8 @@ interface Props {
   sheetIndex: number;
   setSheetIndex: (index: number) => void;
   askSheetRef: React.RefObject<BottomSheet | null>;
+  artifact?: Artifact;
+  setArtifact: (artifact: Artifact) => void;
 }
 
 const ArtifactBottomSheet = ({
@@ -32,9 +34,10 @@ const ArtifactBottomSheet = ({
   sheetIndex,
   setSheetIndex,
   askSheetRef,
+  artifact,
+  setArtifact,
 }: Props) => {
   const arrowAnimation = useRef(new Animated.Value(0)).current;
-  const [artifact, setArtifact] = React.useState<Artifact>();
   const { axiosInstance } = useAuth();
 
   useEffect(() => {
@@ -169,12 +172,12 @@ const ArtifactBottomSheet = ({
                     <Text className="text-white font-ebgaramond font-semibold text-lg">
                       {artifact?.author.name}
                     </Text>
-                    <Text className="text-white text-xs leading-snug mt-4 h-24">
+                    <Text className="text-white text-sm leading-snug mt-4 h-[120px]">
                       {artifact?.author.description}
                     </Text>
                   </View>
                 </View>
-                <View className="items-center flex-1 mt-10">
+                <View className="items-center flex-1 mt-12">
                   <Animated.View
                     style={{ transform: [{ translateY: arrowAnimation }] }}
                   >
@@ -187,8 +190,8 @@ const ArtifactBottomSheet = ({
                     }}
                   >
                     <View className="bg-senary rounded-2xl px-4 py-3 mt-2 self-center">
-                      <Text className="text-center text-primary">
-                        Ask what you want to know
+                      <Text className="text-center text-primary px-8 text-xl font-inter">
+                        Ask me anything
                       </Text>
                     </View>
                   </TouchableOpacity>

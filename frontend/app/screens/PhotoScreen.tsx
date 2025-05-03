@@ -19,7 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
-import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
+import { Artifact, ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
@@ -54,6 +54,16 @@ const PhotoScreen = () => {
   const snapPoints = useMemo(() => ["30%", "93%"], []);
 
   const askSheetRef = useRef<BottomSheet>(null);
+
+  const [artifact, setArtifact] = useState<Artifact>();
+
+  useEffect(() => {
+    console.log("Selected artifact: ", artifact);
+  }, [artifact]);
+
+  useEffect(() => {
+    console.log("Change page");
+  }, [askSheetRef.current]);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
@@ -264,9 +274,15 @@ const PhotoScreen = () => {
               sheetIndex={sheetIndex}
               setSheetIndex={setSheetIndex}
               askSheetRef={askSheetRef}
+              artifact={artifact}
+              setArtifact={setArtifact}
             />
 
-            <AskBottomSheet askSheetRef={askSheetRef} />
+            <AskBottomSheet 
+              askSheetRef={askSheetRef} 
+              artifact={artifact}               
+              articactId={selectedPoint?.artifactId}
+            />
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
