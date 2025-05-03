@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
+import Logo from "../components/Logo";
 
 const SignUpScreen = () => {
   const router = useRouter();
@@ -45,14 +46,10 @@ const SignUpScreen = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View className="w-[95%] h-[95%] bg-primary items-center self-center">
-            <Image
-              source={require("../../assets/images/imgs/logo_ArtSense.png")}
-              className="mt-[4%] self-center"
-              style={{ width: 160, resizeMode: "contain" }}
-            />
+            <Logo />
 
-            <View className="mt-[4%] w-[98%] bg-octonary rounded-[72px] px-8 pb-10">
-              <Text className="mt-[15%] w-full text-quinary font-ebgaramond text-6xl">
+            <View className="mt-[5%] w-[98%] bg-octonary rounded-[72px] px-8 pb-10">
+              <Text className="mt-[15%] w-full text-quinary font-cormorant text-6xl">
                 Sign up
               </Text>
 

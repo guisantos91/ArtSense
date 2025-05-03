@@ -74,7 +74,12 @@ export default function ExhibitionDetailScreen() {
             </Text>
 
             <TouchableOpacity
-              onPress={() => router.push('./QRCodeScreen')}
+              onPress={() => router.push({
+                pathname: "./QRCodeScreen",
+                params: {
+                  id: exhibitionId,
+                },
+              })}
               className="mt-6 w-[62%] h-12 bg-senary rounded-[14px] items-center justify-center mb-8 self-center"
               activeOpacity={0.8}
             >

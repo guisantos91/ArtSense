@@ -24,6 +24,7 @@ module.exports = {
         ebgaramondItalic: ["EBGaramond-Italic"],
         inter: ["Inter"],
         interItalic: ["Inter-Italic"],
+        playfair: ["Playfair"],
       },
     },
     plugins: [],
