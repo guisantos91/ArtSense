@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
@@ -17,23 +16,40 @@ import ExhibitionListCard from "../components/ExhibitionListCard";
 import { ExhibitionWithoutMuseum, getExhibitionByMuseumAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import dayjs from "dayjs";
-
-const SAMPLE_DATES = ["Sun 13", "Mon 14", "Tue 15", "Wed 16", "Thu 17"];
+import Logo from "../components/Logo";
 
 export default function ExhibitionScreen() {
   const { axiosInstance } = useAuth();
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState<string>(SAMPLE_DATES[0]);
-  const [exhibitions, setExhibitions] = useState<ExhibitionWithoutMuseum[]>([]);
   const { museumId } = useLocalSearchParams<{ museumId: string }>();
-  const [exhibitionStartsWith, setExhibitionStartsWith] = useState<string>("");
+
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>(
     dayjs().format("MMM")
   );
   const [selectedYear, setSelectedYear] = useState<string>(
     dayjs().format("YYYY")
   );
+  const [exhibitions, setExhibitions] = useState<ExhibitionWithoutMuseum[]>([]);
+  const [exhibitionStartsWith, setExhibitionStartsWith] = useState<string>("");
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [dayOffset, setDayOffset] = useState(0);
+
+  const generateFiveDays = (offset: number) => {
+    return Array.from({ length: 5 }, (_, i) =>
+      dayjs()
+        .add(offset + i, "day")
+        .format("ddd D")
+    );
+  };
+
+  const sampleDates = generateFiveDays(dayOffset);
+
+  useEffect(() => {
+    setSelectedDate(sampleDates[0]);
+    setSelectedMonth(dayjs().add(dayOffset, "day").format("MMM"));
+    setSelectedYear(dayjs().add(dayOffset, "day").format("YYYY"));
+  }, [dayOffset]);
 
   const showDatePicker = () => setDatePickerVisible(true);
   const hideDatePicker = () => setDatePickerVisible(false);
@@ -60,39 +76,28 @@ export default function ExhibitionScreen() {
   }, []);
 
   useEffect(() => {
-    if (exhibitionStartsWith !== "") {
-      const fetchExhibitions = async () => {
-        const response = await getExhibitionByMuseumAPI(
-          axiosInstance,
-          Number(museumId),
-          exhibitionStartsWith
-        );
-        setExhibitions(response);
-      };
-      fetchExhibitions();
-    } else {
-      const fetchExhibitions = async () => {
-        const response = await getExhibitionByMuseumAPI(
-          axiosInstance,
-          Number(museumId)
-        );
-        setExhibitions(response);
-      };
-      fetchExhibitions();
+    const fetchExhibitions = async () => {
+      const response = await getExhibitionByMuseumAPI(
+        axiosInstance,
+        Number(museumId),
+        exhibitionStartsWith
+      );
+      setExhibitions(response);
+    };
+
+    if (exhibitionStartsWith !== "") fetchExhibitions();
+    else {
+      getExhibitionByMuseumAPI(axiosInstance, Number(museumId)).then(
+        setExhibitions
+      );
     }
   }, [exhibitionStartsWith]);
-
-  console.log("selected date:", selectedDate, selectedMonth, selectedYear);
 
   return (
     <LinearGradient colors={["#202020", "#252525"]} style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-primary">
         <View className="flex-1 w-[95%] self-center">
-          <Image
-            source={require("../../assets/images/imgs/logo.png")}
-            className="mt-[2%] w-full h-[5%] rounded-full"
-            resizeMode="contain"
-          />
+          <Logo />
           <View className="px-4 py-6">
             <Text className="text-quaternary font-inter font-bold text-4xl ml-2 mb-4">
               Exhibitions
@@ -119,11 +124,14 @@ export default function ExhibitionScreen() {
 
           <View className="flex-row flex-1 ml-6">
             <View className="mr-6 items-center">
-              <TouchableOpacity className="mb-4">
+              <TouchableOpacity
+                className="mb-4"
+                onPress={() => setDayOffset((prev) => prev - 5)}
+              >
                 <Ionicons name="chevron-up" size={20} color="#FFF" />
               </TouchableOpacity>
 
-              {SAMPLE_DATES.map((date) => (
+              {sampleDates.map((date) => (
                 <TouchableOpacity
                   key={date}
                   onPress={() => setSelectedDate(date)}
@@ -152,7 +160,10 @@ export default function ExhibitionScreen() {
                 </TouchableOpacity>
               ))}
 
-              <TouchableOpacity className="mt-2">
+              <TouchableOpacity
+                className="mt-2"
+                onPress={() => setDayOffset((prev) => prev + 5)}
+              >
                 <Ionicons name="chevron-down" size={20} color="#FFF" />
               </TouchableOpacity>
             </View>

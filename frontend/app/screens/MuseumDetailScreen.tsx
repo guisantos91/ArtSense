@@ -10,6 +10,7 @@ import {
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import Logo from "../components/Logo";
 
 export default function MuseumDetailScreen() {
   const router = useRouter();
@@ -28,11 +29,8 @@ export default function MuseumDetailScreen() {
             contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
             keyboardShouldPersistTaps="handled"
           >
-            <Image
-              source={require("../../assets/images/imgs/logo.png")}
-              className="mt-[2%] w-full h-[6%] rounded-full"
-              resizeMode="contain"
-            />
+            <Logo />
+
             <View className="flex-row items-center mt-[4%] px-[2%]">
               <TouchableOpacity
                 onPress={() => router.back()}

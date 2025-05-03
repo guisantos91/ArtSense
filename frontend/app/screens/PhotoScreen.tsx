@@ -1,4 +1,10 @@
-import React, { useRef, useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react";
 import {
   View,
   Text,
@@ -23,16 +29,17 @@ import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
+import Logo from "../components/Logo";
 
 interface LayoutDimensions {
   width: number;
   height: number;
-  x: number; 
-  y: number; 
+  x: number;
+  y: number;
 }
 
 const PhotoScreen = () => {
-  const {axiosInstance} = useAuth();
+  const { axiosInstance } = useAuth();
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef<CameraView>(null);
@@ -60,10 +67,10 @@ const PhotoScreen = () => {
   }, []);
 
   const { image, name, description, exhibitionId } = useLocalSearchParams<{
-      image: string;
-      name: string;
-      description: string;
-      exhibitionId: string;
+    image: string;
+    name: string;
+    description: string;
+    exhibitionId: string;
   }>();
 
   const openBottomSheet = (point: ArtifactPointLabel) => {
@@ -88,7 +95,7 @@ const PhotoScreen = () => {
   const takePicture = async () => {
     if (ref.current) {
       setIsLoading(true);
-      setPoints([]); 
+      setPoints([]);
       setImageLayout(null);
       try {
         const photo = await ref.current.takePictureAsync({ quality: 0.1 });
@@ -118,25 +125,28 @@ const PhotoScreen = () => {
         });
 
         const formData = new FormData();
-        const uriParts = photo.uri.split('/');
+        const uriParts = photo.uri.split("/");
         const fileName = uriParts[uriParts.length - 1];
-        let fileType = fileName.split('.').pop();
-        if (fileType === 'jpg') fileType = 'jpeg';
+        let fileType = fileName.split(".").pop();
+        if (fileType === "jpg") fileType = "jpeg";
 
-        formData.append('image', { 
+        formData.append("image", {
           uri: photo.uri,
           name: fileName,
           type: `image/${fileType}`,
         } as any);
 
-        const response = await locateArtifactsAPI(axiosInstance, parseInt(exhibitionId), formData);
+        const response = await locateArtifactsAPI(
+          axiosInstance,
+          parseInt(exhibitionId),
+          formData
+        );
         const backendPoints: ArtifactPointLabel[] = response.data;
-
 
         if (backendPoints && backendPoints.length > 0) {
           console.log("Points detected by the API: ", backendPoints);
 
-          setPoints(backendPoints); 
+          setPoints(backendPoints);
           openBottomSheet(backendPoints[0]); // Open the bottom sheet for the first detected point
           setPhotoData({
             uri: photo.uri,
@@ -145,9 +155,8 @@ const PhotoScreen = () => {
           });
         } else {
           console.log("No artifacts detected by the API.");
-           setPhotoData(null);
+          setPhotoData(null);
         }
-
       } catch (error) {
         console.error("Error taking a picture: ", error);
       } finally {
@@ -165,9 +174,13 @@ const PhotoScreen = () => {
   const onImageLayout = (event: LayoutChangeEvent) => {
     const { width, height, x, y } = event.nativeEvent.layout;
     // Only update if layout actually changes to avoid potential loops
-    if (!imageLayout || imageLayout.width !== width || imageLayout.height !== height) {
-        console.log("ImageBackground Layout Measured:", { width, height, x, y });
-        setImageLayout({ width, height, x, y });
+    if (
+      !imageLayout ||
+      imageLayout.width !== width ||
+      imageLayout.height !== height
+    ) {
+      console.log("ImageBackground Layout Measured:", { width, height, x, y });
+      setImageLayout({ width, height, x, y });
     }
   };
 
@@ -181,71 +194,91 @@ const PhotoScreen = () => {
             resizeMode="cover"
             onLayout={onImageLayout}
           >
-            {imageLayout && photoData && points.map((point, index) => {
-              const photoWidth = photoData.width;
-              const photoHeight = photoData.height;
-              const containerWidth = imageLayout.width;
-              const containerHeight = imageLayout.height;
+            {imageLayout &&
+              photoData &&
+              points.map((point, index) => {
+                const photoWidth = photoData.width;
+                const photoHeight = photoData.height;
+                const containerWidth = imageLayout.width;
+                const containerHeight = imageLayout.height;
 
-              if (!photoWidth || !photoHeight || !containerWidth || !containerHeight) {
-                console.warn("Cannot calculate point position, dimensions missing.");
-                return null;
-              }
+                if (
+                  !photoWidth ||
+                  !photoHeight ||
+                  !containerWidth ||
+                  !containerHeight
+                ) {
+                  console.warn(
+                    "Cannot calculate point position, dimensions missing."
+                  );
+                  return null;
+                }
 
-              const photoAspectRatio = photoWidth / photoHeight;
-              const containerAspectRatio = containerWidth / containerHeight;
+                const photoAspectRatio = photoWidth / photoHeight;
+                const containerAspectRatio = containerWidth / containerHeight;
 
-              let scale = 1;
-              let offsetX = 0;
-              let offsetY = 0;
+                let scale = 1;
+                let offsetX = 0;
+                let offsetY = 0;
 
-              if (containerAspectRatio > photoAspectRatio) {
-                scale = containerWidth / photoWidth;
-                const scaledPhotoHeight = photoHeight * scale;
-                offsetY = (containerHeight - scaledPhotoHeight) / 2; 
-              } else {
+                if (containerAspectRatio > photoAspectRatio) {
+                  scale = containerWidth / photoWidth;
+                  const scaledPhotoHeight = photoHeight * scale;
+                  offsetY = (containerHeight - scaledPhotoHeight) / 2;
+                } else {
+                  scale = containerHeight / photoHeight;
+                  const scaledPhotoWidth = photoWidth * scale;
+                  offsetX = (containerWidth - scaledPhotoWidth) / 2;
+                }
 
-                scale = containerHeight / photoHeight;
-                const scaledPhotoWidth = photoWidth * scale;
-                offsetX = (containerWidth - scaledPhotoWidth) / 2; 
-              }
+                // get real width and height of the display mobile
+                const displayWidth = Dimensions.get("window").width;
+                const displayHeight = Dimensions.get("window").height;
 
-              // get real width and height of the display mobile
-              const displayWidth = Dimensions.get("window").width;
-              const displayHeight = Dimensions.get("window").height;
+                console.log("Display dimensions: ", {
+                  displayWidth,
+                  displayHeight,
+                });
+                console.log("Image dimensions: ", { photoWidth, photoHeight });
 
-              console.log("Display dimensions: ", { displayWidth, displayHeight });
-              console.log("Image dimensions: ", { photoWidth, photoHeight });;
+                const finalX = (point.x / 1000) * displayWidth;
+                const finalY = (point.y / 1000) * displayHeight;
 
-              const finalX = (point.x / 1000) * displayWidth;
-              const finalY = (point.y / 1000) * displayHeight;
+                if (
+                  finalX < -1 ||
+                  finalX > containerWidth + 1 ||
+                  finalY < -1 ||
+                  finalY > containerHeight + 1
+                ) {
+                  console.warn(
+                    `Point ${point.artifactId} (${
+                      point.name
+                    }) is outside visible bounds: (${finalX.toFixed(
+                      1
+                    )}, ${finalY.toFixed(
+                      1
+                    )}) in container (${containerWidth}x${containerHeight})`
+                  );
+                  return null;
+                }
 
-              if (finalX < -1 || finalX > containerWidth + 1 || finalY < -1 || finalY > containerHeight + 1) {
-                console.warn(`Point ${point.artifactId} (${point.name}) is outside visible bounds: (${finalX.toFixed(1)}, ${finalY.toFixed(1)}) in container (${containerWidth}x${containerHeight})`);
-                return null; 
-             }
-
-              return (
-                <TouchableOpacity
-                  key={index}
-                  className="absolute"
-                  style={{ left: finalX, top: finalY }}
-                  onPress={() => openBottomSheet(point)}
-                >
-                  <View className="relative w-5 h-5 items-center justify-center">
-                    <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
-                    <View className="w-5 h-5 bg-white rounded-full" />
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    className="absolute"
+                    style={{ left: finalX, top: finalY }}
+                    onPress={() => openBottomSheet(point)}
+                  >
+                    <View className="relative w-5 h-5 items-center justify-center">
+                      <View className="absolute w-10 h-10 bg-white opacity-20 rounded-full" />
+                      <View className="w-5 h-5 bg-white rounded-full" />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
 
             <View className="items-center">
-              <Image
-                source={require("../../assets/images/imgs/logo_ArtSense.png")}
-                className="self-center"
-                style={{ width: 160, resizeMode: "contain" }}
-              />
+              <Logo />
             </View>
 
             <View className="flex-row items-start w-full pl-6 pb-10">
@@ -285,11 +318,7 @@ const PhotoScreen = () => {
                 </View>
 
                 <View className="flex-1 items-center self-center">
-                  <Image
-                    source={require("../../assets/images/imgs/logo_ArtSense.png")}
-                    className="self-center"
-                    style={{ width: 160, resizeMode: "contain" }}
-                  />
+                  <Logo />
                 </View>
 
                 <View className="w-14" />
@@ -297,7 +326,7 @@ const PhotoScreen = () => {
 
               <View className="flex-1 flex-col justify-end items-center mb-16 space-y-4">
                 <View className="flex-row items-center space-x-2 p-3 bg-senary rounded-xl mb-5">
-                  <Text className="text-black font-ebgaramond text-lg mr-2">
+                  <Text className="text-black font-inter text-sm mr-4">
                     Point the camera to a section with artfacts
                   </Text>
                   <Entypo name="camera" size={24} color="black" />

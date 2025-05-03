@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
+import Logo from "../components/Logo";
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -37,14 +38,10 @@ export default function LoginScreen() {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          <View className="w-[95%] self-center flex-1">
-            <Image
-              source={require("../../assets/images/imgs/logo_ArtSense.png")}
-              className="mt-[4%] self-center"
-              style={{ width: 160, resizeMode: "contain" }}
-            />
+          <View className="w-[95%] h-[95%] bg-primary items-center self-center">
+            <Logo />
 
-            <View className="flex-1 justify-center">
+            <View className="flex-1 justify-center w-full">
               <View className="w-full bg-octonary rounded-[72px] px-10 py-14">
                 <Text className="text-quinary font-ebgaramond text-6xl mb-8">
                   Login
