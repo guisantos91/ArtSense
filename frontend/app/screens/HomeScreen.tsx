@@ -102,7 +102,7 @@ const HomeScreen = () => {
                   </Text>
                   <View className="bg-senary rounded-full p-2.5 mt-[12%] mr-[4%]">
                     <TouchableOpacity
-                      onPress={() => router.push("./PhotoScreen")}
+                      onPress={() => router.push("./QRCodeScreen")}
                       activeOpacity={0.8}
                     >
                       <MaterialCommunityIcons
