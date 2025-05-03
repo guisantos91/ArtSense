@@ -62,25 +62,23 @@ export default function QRCodeScreen() {
       const resp = await axiosInstance.get(`/exhibitions/${exhibitionId}`);
       console.log('Exhibition found:', resp.data);
       console.log('Exhibition ID:', id);
-      if (!id) {
-        router.replace('./PhotoScreen');
+
+      if (resp.data.exhibitionId !== id && id) {
+        Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
       } else {
-        if (resp.data.exhibitionId !== id) {
-          Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
-        }
-        else {
-            router.replace(
-                {
-                pathname: './PhotoScreen',
-                params: {
-                    image: resp.data.image,
-                    name: resp.data.name,
-                    description: resp.data.description,
-                    exhibitionId: resp.data.exhibitionId,
-                },
-            });
-        }
+        router.replace(
+          {
+          pathname: './PhotoScreen',
+          params: {
+              image: resp.data.image,
+              name: resp.data.name,
+              description: resp.data.description,
+              exhibitionId: resp.data.exhibitionId,
+          },
+        });
       }
+
+      
     } catch (err: any) {
       if (err.response?.status === 404) {
         Alert.alert('Invalid QR', 'That exhibition was not found.');

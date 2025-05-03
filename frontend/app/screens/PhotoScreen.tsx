@@ -131,17 +131,17 @@ const PhotoScreen = () => {
           });
         } else {
           console.log("No artifacts detected by the API.");
-          Alert.alert("No Artifacts Found", "Could not detect any known artifacts in the photo.");
+          Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
           setPhotoData(null);
         }
 
       } catch (error: any) {
-        console.error("Error taking a picture: ", error);
+        console.log("Error taking a picture: ", error);
         if (error.isAxiosError) {
           const axiosError = error as AxiosError; // Type assertion
           if (axiosError.response?.status === 404) {
             console.log("API returned 404: No artifacts found.");
-            Alert.alert("No Artifacts Found", "Could not detect any known artifacts in the photo.");
+            Alert.alert("No Artifacts Found", "Could not detect any artifacts from this exhibition in the photo.");
           }
         } else {
           // Handle non-Axios errors (e.g., camera issues, processing errors)
