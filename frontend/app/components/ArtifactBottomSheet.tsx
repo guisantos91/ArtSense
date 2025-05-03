@@ -25,6 +25,7 @@ interface Props {
   askSheetRef: React.RefObject<BottomSheet | null>;
   artifact?: Artifact;
   setArtifact: (artifact: Artifact) => void;
+  setToOpen: (toOpen: boolean) => void;
 }
 
 const ArtifactBottomSheet = ({
@@ -36,6 +37,7 @@ const ArtifactBottomSheet = ({
   askSheetRef,
   artifact,
   setArtifact,
+  setToOpen,
 }: Props) => {
   const arrowAnimation = useRef(new Animated.Value(0)).current;
   const { axiosInstance } = useAuth();
@@ -187,6 +189,7 @@ const ArtifactBottomSheet = ({
                   <TouchableOpacity
                     onPress={() => {
                       askSheetRef.current?.snapToIndex(0);
+                      setToOpen(true);
                     }}
                   >
                     <View className="bg-senary rounded-2xl px-4 py-3 mt-2 self-center">

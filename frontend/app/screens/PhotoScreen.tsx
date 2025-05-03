@@ -23,6 +23,7 @@ import { Artifact, ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
+import WebView from "react-native-webview";
 
 interface LayoutDimensions {
   width: number;
@@ -52,6 +53,8 @@ const PhotoScreen = () => {
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
+
+  const [toOpen, setToOpen] = useState(false);
 
   const askSheetRef = useRef<BottomSheet>(null);
 
@@ -276,13 +279,17 @@ const PhotoScreen = () => {
               askSheetRef={askSheetRef}
               artifact={artifact}
               setArtifact={setArtifact}
+              setToOpen={setToOpen}
             />
 
             <AskBottomSheet 
               askSheetRef={askSheetRef} 
               artifact={artifact}               
               articactId={selectedPoint?.artifactId}
+              toOpen={toOpen}
+              setToOpen={setToOpen}
             />
+            
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
