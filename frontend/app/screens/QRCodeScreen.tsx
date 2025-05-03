@@ -63,7 +63,9 @@ export default function QRCodeScreen() {
       console.log('Exhibition found:', resp.data);
       console.log('Exhibition ID:', id);
 
-      if (resp.data.exhibitionId !== id && id) {
+      console.log('Exhibition ID from data:', resp.data.exhibitionId);
+      
+      if ((resp.data.exhibitionId !== parseInt(id)) && id) {
         Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
       } else {
         router.replace(

@@ -196,18 +196,19 @@ const PhotoScreen = () => {
                 </TouchableOpacity>
               );
             })}
-
-            <View className="items-center">
-              <Logo />
-            </View>
-
-            <View className="flex-row items-start w-full pl-6 pb-10">
+            <View className="flex-row items-center justify-between px-[6%]">
               <TouchableOpacity
                 className="bg-senary p-3 rounded-full"
                 onPress={cancelPhoto}
               >
                 <AntDesign name="arrowleft" size={32} color="black" />
               </TouchableOpacity>
+
+              <View className="items-center">
+                <Logo />
+              </View>
+
+              <View className="w-14" />
             </View>
 
             <ArtifactBottomSheet
