@@ -99,7 +99,7 @@ export default function ExhibitionScreen() {
         <View className="flex-1 w-[95%] self-center">
           <Logo />
           <View className="px-4 py-6">
-            <Text className="text-quaternary font-inter font-bold text-4xl ml-2 mb-4">
+            <Text className="text-quinary font-cormorant text-5xl ml-2 mb-4">
               Exhibitions
             </Text>
             <View className="flex-row items-center">

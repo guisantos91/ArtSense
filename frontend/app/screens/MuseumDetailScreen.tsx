@@ -24,17 +24,19 @@ export default function MuseumDetailScreen() {
   return (
     <LinearGradient colors={["#202020", "#252525"]} style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-primary">
-        <View className="flex-1 w-[95%] self-center">
+        <View className="flex-1 w-[95%] self-center px-4">
           <ScrollView
-            contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
+            contentContainerStyle={{ paddingBottom: 82 }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
             <Logo />
 
-            <View className="flex-row items-center mt-[4%] px-[2%]">
+            <View className="flex-row items-center mt-[4%]">
               <TouchableOpacity
                 onPress={() => router.back()}
                 className="p-[2%]"
+                activeOpacity={0.8}
               >
                 <Ionicons name="arrow-back" size={24} color="#FFF" />
               </TouchableOpacity>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import React, { useEffect, useState } from "react";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import {
   View,
   Text,
@@ -8,11 +8,12 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
+import Logo from "../components/Logo";
 
 const SCAN_TTL_MS = 5000;
 
@@ -52,20 +53,20 @@ export default function QRCodeScreen() {
   const onBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
-  
+
     const exhibitionId = parseInt(data, 10);
     try {
       const resp = await axiosInstance.get(`/exhibitions/${exhibitionId}`);
-      console.log('Exhibition found:', resp.data);
-      router.replace('./PhotoScreen')
+      console.log("Exhibition found:", resp.data);
+      router.replace("./PhotoScreen");
     } catch (err: any) {
       if (err.response?.status === 404) {
-        Alert.alert('Invalid QR', 'That exhibition was not found.');
+        Alert.alert("Invalid QR", "That exhibition was not found.");
       } else {
-        Alert.alert('Network error', 'Could not verify this exhibition.');
+        Alert.alert("Network error", "Could not verify this exhibition.");
       }
     }
-  
+
     setTimeout(() => setScanned(false), SCAN_TTL_MS);
   };
 
@@ -75,23 +76,18 @@ export default function QRCodeScreen() {
       <CameraView
         style={{ flex: 1 }}
         facing="back"
-        barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
         onBarcodeScanned={onBarCodeScanned}
       />
 
-
-      <View className="absolute top-4 inset-x-4 flex-row justify-between items-center z-10">
+      <View className="absolute top-4 inset-x-4 flex-row justify-between items-center z-10 mt-[4%]">
         <TouchableOpacity
           onPress={() => router.back()}
           className="w-24 h-24 items-center justify-center"
         >
           <Ionicons name="close" size={32} color="#FFF" />
         </TouchableOpacity>
-        <Image
-          source={require('../../assets/images/imgs/logo.png')}
-          className="w-48 h-24"
-          resizeMode="contain"
-        />
+        <Logo />
         <View className="w-16 h-16" />
       </View>
 
@@ -111,7 +107,7 @@ export default function QRCodeScreen() {
         </View>
       </View>
 
-      <View className="absolute inset-x-5 bottom-12 bg-white rounded-full flex-row items-center justify-center py-2 mx-8">
+      <View className="absolute inset-x-5 bottom-14 bg-white rounded-2xl flex-row items-center justify-center py-2 mx-8">
         <MaterialCommunityIcons
           name="qrcode-scan"
           size={20}
