@@ -4,12 +4,11 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   SafeAreaView,
   StatusBar,
   Alert,
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";

@@ -9,10 +9,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   Button,
   ImageBackground,
-  LayoutChangeEvent,
   Dimensions,
   Modal,
   Alert,
@@ -25,12 +23,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { LinearGradient } from "expo-linear-gradient";
+import BottomSheet from "@gorhom/bottom-sheet";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
 import { Artifact, ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
-import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
 import { AxiosError } from "axios";
 import Logo from "../components/Logo";
