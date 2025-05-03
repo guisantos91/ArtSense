@@ -9,7 +9,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,25 +63,25 @@ export default function QRCodeScreen() {
       const resp = await axiosInstance.get(`/exhibitions/${exhibitionId}`);
       console.log('Exhibition found:', resp.data);
       console.log('Exhibition ID:', id);
-      if (!id) {
-        router.replace('./PhotoScreen');
+
+      console.log('Exhibition ID from data:', resp.data.exhibitionId);
+      
+      if ((resp.data.exhibitionId !== parseInt(id)) && id) {
+        Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
       } else {
-        if (resp.data.exhibitionId !== id) {
-          Alert.alert('Invalid QR', 'This QR code does not match the exhibition.');
-        }
-        else {
-            router.replace(
-                {
-                pathname: './PhotoScreen',
-                params: {
-                    image: resp.data.image,
-                    name: resp.data.name,
-                    description: resp.data.description,
-                    exhibitionId: resp.data.exhibitionId,
-                },
-            });
-        }
+        router.push(
+          {
+          pathname: './PhotoScreen',
+          params: {
+              image: resp.data.image,
+              name: resp.data.name,
+              description: resp.data.description,
+              exhibitionId: resp.data.exhibitionId,
+          },
+        });
       }
+
+      
     } catch (err: any) {
       if (err.response?.status === 404) {
         Alert.alert("Invalid QR", "That exhibition was not found.");
@@ -104,12 +104,15 @@ export default function QRCodeScreen() {
       />
 
       <View className="absolute top-4 inset-x-4 flex-row justify-between items-center z-10 mt-[4%]">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="w-24 h-24 items-center justify-center"
-        >
-          <Ionicons name="close" size={32} color="#FFF" />
-        </TouchableOpacity>
+      <View className="items-start w-14">
+      <TouchableOpacity
+        onPress={() => router.back()}
+        className="bg-white p-2 rounded-full"
+        activeOpacity={0.8}
+      >
+        <AntDesign name="close" size={32} color="black" />
+      </TouchableOpacity>
+    </View>
         <Logo />
         <View className="w-16 h-16" />
       </View>

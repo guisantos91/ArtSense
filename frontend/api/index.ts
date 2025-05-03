@@ -11,7 +11,8 @@ export {
     getExhibitionsAPI,
     getExhibitionByMuseumAPI,
     locateArtifactsAPI,
-    getArtifactAPI
+    getArtifactAPI,
+    promptLLM
 } from './api-consumer';
 
 export type {

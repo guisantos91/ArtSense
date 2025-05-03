@@ -1,7 +1,15 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import WebView from "react-native-webview";
 import Logo from "../components/Logo";
 
 const LandingScreen = () => {
@@ -45,7 +53,6 @@ const LandingScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-
           <TouchableOpacity
             onPress={() => router.replace("./screens/LoginScreen")}
             className="mt-[8%] w-[65%] h-12 bg-senary rounded-[14px] items-center justify-center"

@@ -71,19 +71,19 @@ public class DataLoader implements CommandLineRunner {
         // --- Create Authors ---
         Author daVinci = findOrCreateAuthor(
             "Leonardo da Vinci",
-            "An Italian polymath of the High Renaissance, Leonardo da Vinci (1452–1519) is widely regarded as one of the most diversely talented individuals ever to have lived. Primarily known as a painter, his works like the Mona Lisa and The Last Supper are among the most famous and reproduced. His genius extended to invention, drawing, sculpting, architecture, science, music, mathematics, engineering, anatomy, geology, astronomy, botany, writing, and history.",
+            "An Italian polymath of the High Renaissance, Leonardo da Vinci (1452-1519) is renowned for his contributions to art, science, and engineering.",
             "https://i.pinimg.com/564x/ea/99/17/ea9917931bd716bc9616c61555eaa190.jpg"
         );
 
         Author vanGogh = findOrCreateAuthor(
             "Vincent van Gogh",
-            "Vincent Willem van Gogh (1853–1890) was a Dutch Post-Impressionist painter who posthumously became one of the most influential figures in Western art history. In just over a decade, he created approximately 2,100 artworks, including around 860 oil paintings, most dating from the last two years of his life. His works are characterized by bold colors, dramatic brushwork, and emotional honesty, influencing modern art profoundly.",
+            "Vincent Willem van Gogh (1853-1890) was a Dutch Post-Impressionist painter who became one of the most influential figures in Western art history.",
             "https://hips.hearstapps.com/hmg-prod/images/vincent_van_gogh_self_portrait_painting_muse%CC%81e_d'orsay_via_wikimedia_commons_promo.jpg?resize=980:*" // Placeholder URL
         );
 
         Author monet = findOrCreateAuthor(
             "Claude Monet",
-            "Oscar-Claude Monet (1840–1926) was a French painter and a founder of the Impressionist movement, which is seen as a key precursor to modernism, especially in his attempts to paint nature as he perceived it. He was the most consistent and prolific practitioner of the movement's philosophy of expressing one's perceptions before nature, particularly applied to plein air landscape painting. His Water Lilies series is world-renowned.",
+            "Oscar-Claude Monet (1840-1926) was a French painter and a founder of the Impressionist movement, which is seen as a key precursor to modernism.",
             "https://uploads0.wikiart.org/00115/images/claude-monet/440px-claude-monet-1899-nadar-crop.jpg!Portrait.jpg"
         );
 
@@ -130,7 +130,7 @@ public class DataLoader implements CommandLineRunner {
             "Also known as the Nike of Samothrace, this 2nd-century BC marble sculpture depicts the Greek goddess of victory, Nike. Despite being significantly damaged (most notably missing her head and arms), it is celebrated as one of the greatest surviving masterpieces of Hellenistic sculpture. Its dynamic pose, masterful rendering of flowing drapery, and dramatic sense of movement are highly admired.",
             "Parian marble",
             "https://www.worldhistory.org/img/r/p/500x600/5287.jpg?v=1652876104",
-            "244 cm (height)", null, "artifact_wingedvictory", // Author unknown/not applicable
+            "244 cm (height)", monet, "artifact_wingedvictory", // Author unknown/not applicable
             "image/jpg" // Placeholder for LLM ID
         );
 

@@ -15,6 +15,8 @@ import {
   LayoutChangeEvent,
   Dimensions,
   Modal,
+  Alert,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
@@ -26,18 +28,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import ArtifactBottomSheet from "../components/ArtifactBottomSheet";
-import { ArtifactPointLabel, locateArtifactsAPI } from "@/api";
+import { Artifact, ArtifactPointLabel, locateArtifactsAPI } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
+import { AxiosError } from "axios";
 import Logo from "../components/Logo";
-
-interface LayoutDimensions {
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-}
 
 const PhotoScreen = () => {
   const { axiosInstance } = useAuth();
@@ -56,16 +52,27 @@ const PhotoScreen = () => {
   );
   const [sheetIndex, setSheetIndex] = useState(0);
   const [points, setPoints] = useState<ArtifactPointLabel[]>([]);
-  const [imageLayout, setImageLayout] = useState<LayoutDimensions | null>(null);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "93%"], []);
+
+  const [toOpen, setToOpen] = useState(false);
 
   const askSheetRef = useRef<BottomSheet>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
   useEffect(() => {
     setShowWelcomeModal(true);
   }, []);
+
+  const [artifact, setArtifact] = useState<Artifact>();
+
+  useEffect(() => {
+    console.log("Selected artifact: ", artifact);
+  }, [artifact]);
+
+  useEffect(() => {
+    console.log("Change page");
+  }, [askSheetRef.current]);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSheetIndex(index);
@@ -101,27 +108,8 @@ const PhotoScreen = () => {
     if (ref.current) {
       setIsLoading(true);
       setPoints([]);
-      setImageLayout(null);
       try {
         const photo = await ref.current.takePictureAsync({ quality: 0.1 });
-
-        // Import the required library for EXIF manipulation
-
-        // Rotate the image based on EXIF orientation
-        // const manipulatedPhoto = await ImageManipulator.manipulateAsync(
-        //   photo.uri,
-        //   [{ rotate: 90 }] // rotation in degrees to the right
-        // );
-
-        // const finalPhoto = {
-        //   uri: manipulatedPhoto.uri,
-        //   width: manipulatedPhoto.width,
-        //   height: manipulatedPhoto.height,
-        // };
-
-        // photo.uri = finalPhoto.uri;
-        // photo.width = finalPhoto.width;
-        // photo.height = finalPhoto.height;
 
         setPhotoData({
           uri: photo.uri,
@@ -160,10 +148,27 @@ const PhotoScreen = () => {
           });
         } else {
           console.log("No artifacts detected by the API.");
+          Alert.alert(
+            "No Artifacts Found",
+            "Could not detect any artifacts from this exhibition in the photo."
+          );
           setPhotoData(null);
         }
-      } catch (error) {
-        console.error("Error taking a picture: ", error);
+      } catch (error: any) {
+        console.log("Error taking a picture: ", error);
+        if (error.isAxiosError) {
+          const axiosError = error as AxiosError; // Type assertion
+          if (axiosError.response?.status === 404) {
+            console.log("API returned 404: No artifacts found.");
+            Alert.alert(
+              "No Artifacts Found",
+              "Could not detect any artifacts from this exhibition in the photo."
+            );
+          }
+        } else {
+          // Handle non-Axios errors (e.g., camera issues, processing errors)
+          Alert.alert("Error", "An error occurred while processing the photo.");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -173,25 +178,12 @@ const PhotoScreen = () => {
   const cancelPhoto = () => {
     setPhotoData(null);
     setPoints([]);
-    setImageLayout(null);
-  };
-
-  const onImageLayout = (event: LayoutChangeEvent) => {
-    const { width, height, x, y } = event.nativeEvent.layout;
-    // Only update if layout actually changes to avoid potential loops
-    if (
-      !imageLayout ||
-      imageLayout.width !== width ||
-      imageLayout.height !== height
-    ) {
-      console.log("ImageBackground Layout Measured:", { width, height, x, y });
-      setImageLayout({ width, height, x, y });
-    }
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-primary">
+        <StatusBar hidden />
         {showWelcomeModal && (
           <Modal visible transparent animationType="fade">
             <View className="flex-1 bg-black bg-opacity-70 justify-center items-center px-6">
@@ -218,49 +210,14 @@ const PhotoScreen = () => {
             source={{ uri: photoData.uri }}
             className="flex-1 justify-between relative"
             resizeMode="cover"
-            onLayout={onImageLayout}
           >
-            {imageLayout &&
-              photoData &&
+            {photoData &&
               points.map((point, index) => {
                 const photoWidth = photoData.width;
                 const photoHeight = photoData.height;
-                const containerWidth = imageLayout.width;
-                const containerHeight = imageLayout.height;
 
-                if (
-                  !photoWidth ||
-                  !photoHeight ||
-                  !containerWidth ||
-                  !containerHeight
-                ) {
-                  console.warn(
-                    "Cannot calculate point position, dimensions missing."
-                  );
-                  return null;
-                }
-
-                const photoAspectRatio = photoWidth / photoHeight;
-                const containerAspectRatio = containerWidth / containerHeight;
-
-                let scale = 1;
-                let offsetX = 0;
-                let offsetY = 0;
-
-                if (containerAspectRatio > photoAspectRatio) {
-                  scale = containerWidth / photoWidth;
-                  const scaledPhotoHeight = photoHeight * scale;
-                  offsetY = (containerHeight - scaledPhotoHeight) / 2;
-                } else {
-                  scale = containerHeight / photoHeight;
-                  const scaledPhotoWidth = photoWidth * scale;
-                  offsetX = (containerWidth - scaledPhotoWidth) / 2;
-                }
-
-                // get real width and height of the display mobile
                 const displayWidth = Dimensions.get("window").width;
                 const displayHeight = Dimensions.get("window").height;
-
                 console.log("Display dimensions: ", {
                   displayWidth,
                   displayHeight,
@@ -269,24 +226,6 @@ const PhotoScreen = () => {
 
                 const finalX = (point.x / 1000) * displayWidth;
                 const finalY = (point.y / 1000) * displayHeight;
-
-                if (
-                  finalX < -1 ||
-                  finalX > containerWidth + 1 ||
-                  finalY < -1 ||
-                  finalY > containerHeight + 1
-                ) {
-                  console.warn(
-                    `Point ${point.artifactId} (${
-                      point.name
-                    }) is outside visible bounds: (${finalX.toFixed(
-                      1
-                    )}, ${finalY.toFixed(
-                      1
-                    )}) in container (${containerWidth}x${containerHeight})`
-                  );
-                  return null;
-                }
 
                 return (
                   <TouchableOpacity
@@ -302,11 +241,17 @@ const PhotoScreen = () => {
                   </TouchableOpacity>
                 );
               })}
+            {/* <View className="flex-row items-center justify-between px-[6%]"> */}
+            {/* <TouchableOpacity
+                className="bg-senary p-3 rounded-full"
+                onPress={cancelPhoto}
+              >
+                <AntDesign name="arrowleft" size={32} color="black" />
+              </TouchableOpacity> */}
 
             <View className="items-center">
               <Logo />
             </View>
-
             <View className="flex-row items-start w-full pl-6 pb-10">
               <TouchableOpacity
                 className="bg-senary p-3 rounded-full"
@@ -323,9 +268,18 @@ const PhotoScreen = () => {
               sheetIndex={sheetIndex}
               setSheetIndex={setSheetIndex}
               askSheetRef={askSheetRef}
+              artifact={artifact}
+              setArtifact={setArtifact}
+              setToOpen={setToOpen}
             />
 
-            <AskBottomSheet askSheetRef={askSheetRef} />
+            <AskBottomSheet
+              askSheetRef={askSheetRef}
+              artifact={artifact}
+              articactId={selectedPoint?.artifactId}
+              toOpen={toOpen}
+              setToOpen={setToOpen}
+            />
           </ImageBackground>
         ) : (
           <View className="flex-1 relative">
@@ -351,11 +305,17 @@ const PhotoScreen = () => {
               </View>
 
               <View className="flex-1 flex-col justify-end items-center mb-16 space-y-4">
-                <View className="flex-row items-center space-x-2 p-3 bg-senary rounded-xl mb-5">
-                  <Text className="text-black font-inter text-sm mr-4">
+                <View className="absolute inset-x-5 bottom-28 bg-white rounded-2xl flex-row items-center justify-center py-2 mx-8">
+                  <Entypo
+                    name="camera"
+                    className="pr-3 pb-1"
+                    size={24}
+                    color="black"
+                  />
+
+                  <Text className="text-black text-sm font-inter">
                     Point the camera to a section with artfacts
                   </Text>
-                  <Entypo name="camera" size={24} color="black" />
                 </View>
 
                 <TouchableOpacity
