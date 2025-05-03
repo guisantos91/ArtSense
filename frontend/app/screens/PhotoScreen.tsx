@@ -31,6 +31,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import * as ImageManipulator from "expo-image-manipulator";
 import AskBottomSheet from "../components/AskBottomSheet";
 import { AxiosError } from "axios";
+import Logo from "../components/Logo";
 
 
 const PhotoScreen = () => {
@@ -170,6 +171,8 @@ const PhotoScreen = () => {
               const photoWidth = photoData.width;
               const photoHeight = photoData.height;
 
+                const displayWidth = Dimensions.get("window").width;
+                const displayHeight = Dimensions.get("window").height;
                 console.log("Display dimensions: ", {
                   displayWidth,
                   displayHeight,
@@ -178,24 +181,6 @@ const PhotoScreen = () => {
 
                 const finalX = (point.x / 1000) * displayWidth;
                 const finalY = (point.y / 1000) * displayHeight;
-
-                if (
-                  finalX < -1 ||
-                  finalX > containerWidth + 1 ||
-                  finalY < -1 ||
-                  finalY > containerHeight + 1
-                ) {
-                  console.warn(
-                    `Point ${point.artifactId} (${
-                      point.name
-                    }) is outside visible bounds: (${finalX.toFixed(
-                      1
-                    )}, ${finalY.toFixed(
-                      1
-                    )}) in container (${containerWidth}x${containerHeight})`
-                  );
-                  return null;
-                }
 
               return (
                 <TouchableOpacity
