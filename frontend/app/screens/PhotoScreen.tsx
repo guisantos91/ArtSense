@@ -140,7 +140,7 @@ const PhotoScreen = () => {
           console.log("Points detected by the API: ", backendPoints);
 
           setPoints(backendPoints);
-          openBottomSheet(backendPoints[0]); // Open the bottom sheet for the first detected point
+          openBottomSheet(backendPoints[0]);
           setPhotoData({
             uri: photo.uri,
             width: photo.width,
@@ -157,7 +157,7 @@ const PhotoScreen = () => {
       } catch (error: any) {
         console.log("Error taking a picture: ", error);
         if (error.isAxiosError) {
-          const axiosError = error as AxiosError; // Type assertion
+          const axiosError = error as AxiosError;
           if (axiosError.response?.status === 404) {
             console.log("API returned 404: No artifacts found.");
             Alert.alert(
@@ -166,7 +166,6 @@ const PhotoScreen = () => {
             );
           }
         } else {
-          // Handle non-Axios errors (e.g., camera issues, processing errors)
           Alert.alert("Error", "An error occurred while processing the photo.");
         }
       } finally {
@@ -241,13 +240,6 @@ const PhotoScreen = () => {
                   </TouchableOpacity>
                 );
               })}
-            {/* <View className="flex-row items-center justify-between px-[6%]"> */}
-            {/* <TouchableOpacity
-                className="bg-senary p-3 rounded-full"
-                onPress={cancelPhoto}
-              >
-                <AntDesign name="arrowleft" size={32} color="black" />
-              </TouchableOpacity> */}
 
             <View className="items-center">
               <Logo />

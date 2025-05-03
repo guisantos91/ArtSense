@@ -48,7 +48,6 @@ const HomeScreen = () => {
   useEffect(() => {
     if (museumStartsWith !== "") {
       console.log("Museum starts with: ", museumStartsWith);
-      //TODO
       const fetchMuseums = async () => {
         const response = await getMuseumsAPI(axiosInstance, museumStartsWith);
         setMuseums(response);

@@ -23,7 +23,6 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       console.log("Logging in with", { email, password });
-      // await login({ email, password });
       router.replace("./HomeScreen");
     } catch (error) {
       console.error("Login failed", error);

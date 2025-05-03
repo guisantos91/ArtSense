@@ -54,7 +54,6 @@ const AskBottomSheet = ({
   const { axiosInstance } = useAuth();
   const arrowAnimation = useRef(new Animated.Value(0)).current;
 
-  // Empacota o teu snippet numa página completa
   const fullHtml = useMemo(
     () => `
   <!DOCTYPE html>
@@ -157,14 +156,14 @@ const AskBottomSheet = ({
         ])
       ).start();
     } else {
-      arrowAnimation.stopAnimation(); // Para a animação quando começa a escrever
+      arrowAnimation.stopAnimation();
     }
   }, [prompt]);
 
   const handleSend = async () => {
     if (!tempPrompt.trim()) return;
     if (!articactId) return;
-    setPrompt(tempPrompt); // só agora atualiza o título com o input
+    setPrompt(tempPrompt);
     setIsLoading(true);
     setResponse(null);
     setHtmlGoogleSearchSuggestion(null);
@@ -199,7 +198,6 @@ const AskBottomSheet = ({
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <BottomSheetView className="flex-1 overflow-hidden bg-primary rounded-t-[40]">
-          {/* <ScrollView automaticallyAdjustKeyboardInsets={true}> */}
 
           <ImageBackground
             source={
@@ -270,14 +268,12 @@ const AskBottomSheet = ({
                   automaticallyAdjustContentInsets={false}
                   onShouldStartLoadWithRequest={(event: WebViewNavigation) => {
                     const url = event.url;
-                    // mantém o WebView apenas para a página inicial em branco/data
                     if (
                       url.startsWith("data:text/html") ||
                       url === "about:blank"
                     ) {
                       return true;
                     }
-                    // abre qualquer outro link no navegador externo
                     Linking.openURL(url);
                     return false;
                   }}
@@ -309,12 +305,6 @@ const AskBottomSheet = ({
                 style={{ textAlignVertical: "center" }}
               />
             </View>
-            {/* <TouchableOpacity
-              className="bg-tertiary rounded-2xl px-4 py-3"
-              activeOpacity={0.8}
-            >
-              <FontAwesome5 name="images" size={18} color="#D9D8DE" />
-            </TouchableOpacity> */}
             <TouchableOpacity
               className="px-2 py-2 ml-2"
               activeOpacity={0.8}
@@ -323,7 +313,6 @@ const AskBottomSheet = ({
               <Ionicons name="paper-plane" size={24} color="#D9D8DE" />
             </TouchableOpacity>
           </View>
-          {/* </ScrollView> */}
         </BottomSheetView>
       </TouchableWithoutFeedback>
     </BottomSheet>

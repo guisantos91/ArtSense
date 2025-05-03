@@ -61,12 +61,10 @@ const ArtifactBottomSheet = ({
     ).start();
   }, []);
 
-  // const 
   useEffect(() => {
     if (selectedPoint) {
       const fetchArtifact = async () => {
         const response = await getArtifactAPI(axiosInstance, selectedPoint.artifactId);
-        // console.log("artifact", response);
         setArtifact(response);
       } 
       console.log("selectedPoint", selectedPoint);
@@ -75,8 +73,6 @@ const ArtifactBottomSheet = ({
   }, [selectedPoint]);
 
   useEffect(() => {
-    // aa
-    // console.log("artifact", artifact);
   }, [artifact]);
 
   return (
