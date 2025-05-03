@@ -73,7 +73,7 @@ const SignUpScreen = () => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="email"
+                  placeholder="example@gmail.com"
                   placeholderTextColor={"#CFCFCF"}
                   keyboardType="email-address"
                   autoCapitalize="none"

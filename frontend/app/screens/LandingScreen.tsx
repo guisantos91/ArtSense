@@ -10,8 +10,8 @@ const LandingScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView
-        className="flex-1 w-full"
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 82 }}
+        keyboardShouldPersistTaps="handled"
       >
         <View className="w-[95%] h-[95%] bg-primary items-center self-center">
           <Logo />
