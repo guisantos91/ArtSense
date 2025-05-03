@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import WebView from "react-native-webview";
+import Logo from "../components/Logo";
 
 const LandingScreen = () => {
   const router = useRouter();
@@ -17,16 +18,13 @@ const LandingScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView
-        className="flex-1 w-full"
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ paddingBottom: 82 }}
+        keyboardShouldPersistTaps="handled"
       >
         <View className="w-[95%] h-[95%] bg-primary items-center self-center">
-          <Image
-            source={require("../../assets/images/imgs/logo.png")}
-            className="mt-[10%] w-full h-[5%] rounded-full"
-            resizeMode="contain"
-          />
-          <View className="mt-[7%] w-[98%] min-h-[540px] bg-octonary rounded-[72px] relative overflow-hidden">
+          <Logo />
+
+          <View className="mt-[4%] w-full min-h-[540px] bg-octonary rounded-[72px] relative overflow-hidden">
             <Image
               source={require("../../assets/images/imgs/main-image.png")}
               className="absolute bottom-0 right-0 w-[80%] h-[340px] z-0"
@@ -39,13 +37,16 @@ const LandingScreen = () => {
               </Text>
 
               <Text className="mt-5 w-full text-quaternary font-medium text-sm leading-[18px]">
-                From symbols of power to everyday life, explore how artists have shaped history. Uncover hidden stories and techniques with{" "}
-                <Text className="text-quaternary font-extrabold">ArtSense</Text>.
+                From symbols of power to everyday life, explore how artists have
+                shaped history. Uncover hidden stories and techniques with{" "}
+                <Text className="text-quaternary font-extrabold">ArtSense</Text>
+                .
               </Text>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => router.push("./screens/LoginScreen")}
-                className="mt-5 w-[116px] h-[36px] border border-[#f0eace2e] rounded-[14px] items-center justify-center">
+                className="mt-5 w-[116px] h-[36px] border border-[#f0eace2e] rounded-[14px] items-center justify-center"
+              >
                 <Text className="text-undecenary font-medium text-sm leading-[18px]">
                   Explore more...
                 </Text>

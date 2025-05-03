@@ -11,6 +11,7 @@ export default function Index() {
     "EBGaramond-Italic": require("../assets/fonts/EBGaramond-Italic-VariableFont_wght.ttf"),
     Inter: require("../assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
     "Inter-Italic": require("../assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf"),
+    Playfair: require("../assets/fonts/Playfair-VariableFont_opsz,wdth,wght.ttf"),
   });
 
   if (!fontsLoaded) {
