@@ -90,6 +90,7 @@ const HomeScreen = () => {
             className="flex-1 w-full"
             contentContainerStyle={{ paddingBottom: 20 }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
             <View className="w-[95%] items-center self-center">
               <Logo />
