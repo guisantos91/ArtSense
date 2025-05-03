@@ -206,23 +206,21 @@ public class LLMService {
                   "3. Detect which of the named 'Reference Artifacts' are present within the 'Image to Analyze'. Do NOT report an artifact if it is only visible in its own 'Reference Artifacts' image but not in the 'Image to Analyze'.\n" +
                   "4. For each artifact that you are 100% sure that was detected *within the 'Image to Analyze'*, provide its center pixel coordinates [x, y]. These coordinates MUST be relative to the 'Image to Analyze' and normalized to a 0-1000 scale for both x and y.\n" +
                   "5. If you are NOT SURE about the detection of an artifact, do NOT include it in the output.\n" +
-                  // Reverted JSON example format (no quotes on keys)
                   "6. Return ONLY a VALID JSON object containing the detections regardless of the outcome, DO NOT say anything more.\n" + 
                   "7. Answer with the following format (DO NOT forget the double quotes in the key):\n" +
                   "```json\n" +
                   "{\n" +
-                  "  detections: [\n" + // Reverted: no quotes
-                  "    {id: artifact-id-1, coordinates: [x1, y1]},\n" + // Reverted: no quotes
-                  "    {id: artifact-id-2, coordinates: [x2, y2]},\n" + // Reverted: no quotes
+                  "  detections: [\n" +
+                  "    {id: artifact-id-1, coordinates: [x1, y1]},\n" +
+                  "    {id: artifact-id-2, coordinates: [x2, y2]},\n" +
                   "    ...\n" +
                   "  ]\n" +
                   "}\n" +
                   "```\n" +
-                  // Reverted JSON example format for empty case
                   "6. If none of the 'Reference Artifacts' are found within the 'Image to Analyze', return exactly:\n" +
                   "```json\n" +
                   "{\n" +
-                  "  detections: []\n" + // Reverted: no quotes
+                  "  detections: []\n" +
                   "}\n" +
                   "```";
 
