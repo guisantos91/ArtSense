@@ -1,22 +1,15 @@
 # ArtSense
 
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/37ab154e-cfd5-4108-a492-61ceda6239da" alt="Screenshot 1" width="960" height="540">
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/6bc21f0b-0aa7-44ad-9d25-87220c7def0d" alt="Screenshot 2" width="960" height="540">
-    </td>
-  </tr>
-</table>
+## Introduction 
+
+During a **48-hour hackathon**, we developed an **AI-powered mobile application** designed to enhance the museum experience and address a significant challenge faced by **small museums**: providing engaging guided tours and audio guides.
+
+
+<img src="https://github.com/user-attachments/assets/37ab154e-cfd5-4108-a492-61ceda6239da" alt="Screenshot 1" width="1922" height="1080">
 
 [demo.pm4](https://github.com/user-attachments/assets/b8c55704-76f6-459a-9291-0051a08d1c20)
 
 
-## Introduction 
-
-During a **48-hour hackathon**, we developed an **AI-powered mobile application** designed to enhance the museum experience and address a significant challenge faced by **small museums**: providing engaging guided tours and audio guides.
 
 ## How It Works
 
